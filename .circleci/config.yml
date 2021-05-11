@@ -96,6 +96,7 @@ jobs:
           name: Back-end test
           command: |
             cd backend
+            npm install jest  # TODO: how on earth is the test runner not installed ? even though the same image is used...
             npm run test
       - save_cache:
           paths: [backend/node_modules]
