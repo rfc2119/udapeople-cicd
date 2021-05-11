@@ -109,13 +109,6 @@ jobs:
 #       # Checkout code from git
 #       # Restore from cache
 #       # Your job code here
-    docker:
-    docker:
-      # Docker image here
-    steps:
-      # Checkout code from git
-      # Restore from cache
-      # Your job code here
             
 #   scan-frontend:
 #     docker:
