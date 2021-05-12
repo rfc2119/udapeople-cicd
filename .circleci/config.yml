@@ -177,12 +177,12 @@ jobs:
           command: |
             echo "cwd: $CIRCLE_WORKING_DIRECTORY"
             ls -la
-            apt install tree
-            tree
+            # apt install tree
+            # tree
             aws ec2 describe-instances \
               --filters Name="tag:Name,Values=backend-$ID" \
               --query 'Reservations[*].Instances[*].PublicIpAddress' \
-              --output text | tee -a $CIRCLE_WORKING_DIRECTORY/.circleci/ansible/inventory.txt
+              --output text | tee -a .circleci/ansible/inventory.txt
             # $CIRCLE_WORKING_DIRECTORY defaults to "project"
             # see https://circleci.com/docs/2.0/configuration-reference/#jobs
       - persist_to_workspace:
