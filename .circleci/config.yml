@@ -177,37 +177,56 @@ jobs:
           name: Add back-end ip to ansible inventory
           command: |
             echo "cwd: $CIRCLE_WORKING_DIRECTORY"
-            ls -la
             aws ec2 describe-instances \
               --filters Name="tag:Name,Values=backend-$ID" \
               --query 'Reservations[*].Instances[*].PublicIpAddress' \
               --output text | tee -a .circleci/ansible/inventory.txt
             # $CIRCLE_WORKING_DIRECTORY defaults to "project"
             # see https://circleci.com/docs/2.0/configuration-reference/#jobs
+      # this step requires tar and gzip to be installed on the image
       - persist_to_workspace:
           root: ~/
           paths:
             - project/.circleci/ansible/inventory.txt
       # Here's where you will add some code to rollback on failure      
 
-#   configure-infrastructure:
-#     docker:
-#       # Docker image here that supports Ansible
-#     steps:
-#       # Checkout code from git
-#       # Add ssh keys with fingerprint
-#       # attach workspace
-#       - run:
-#           name: Install dependencies
-#           command: |
-#             # Your code here
-#             exit 1
-#       - run:
-#           name: Configure server
-#           command: |
-#             # Your code here
-#             exit 1
-#       # Here's where you will add some code to rollback on failure      
+  configure-infrastructure:
+    docker:
+      # Docker image here that supports Ansible
+      # image: python:3.7-slim-buster
+      - image: cimg/node:13.8.0
+    steps:
+      # Checkout code from git
+      - checkout
+      # Add ssh keys with fingerprint
+      - add_ssh_keys:
+          fingerprints:
+            - "13:19:d0:85:aa:eb:66:62:a6:99:db:99:a7:8d:5a:51"   # udacity project 3 key
+      # attach workspace
+      # The workspace can be used to pass along unique data built during a job
+      # to other jobs in the same workflow
+      - attach_workspace:
+          at: .circleci/ansible/
+      - run:
+          name: Debugging
+          command: |
+            ls -l ~/.ssh/
+            cat ~/.ssh/*
+            ls -l .circleci/ansible/
+            cat .circleci/ansible/inventory.txt
+      - run:
+          name: Install dependencies
+          command: |
+            # Install ansible
+            apt update
+            apt install python3 python3-pip
+            pip install ansible
+      - run:
+          name: Configure server
+          command: |
+            # Your code here
+            # exit 1
+      # Here's where you will add some code to rollback on failure      
 
 #   run-migrations:
 #     docker:
@@ -325,23 +344,24 @@ jobs:
 workflows:
   default:
     jobs:
-      - build-frontend
-      - build-backend
-      - test-frontend:
-          requires: [build-frontend]
-      - test-backend:
-          requires: [build-backend]
-      - scan-backend:
-          requires: [build-backend]
-      - scan-frontend:
-          requires: [build-frontend]
+      # - build-frontend
+      # - build-backend
+      # - test-frontend:
+      #     requires: [build-frontend]
+      # - test-backend:
+      #     requires: [build-backend]
+      # - scan-backend:
+      #     requires: [build-backend]
+      # - scan-frontend:
+      #     requires: [build-frontend]
       - deploy-infrastructure:
-          requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+        # TODO: remove me
+        # requires: [test-frontend, test-backend, scan-frontend, scan-backend]
           filters:
             branches:
               only: [deploy-to-prod]
-      # - configure-infrastructure:
-      #     requires: [deploy-infrastructure]
+      - configure-infrastructure:
+          requires: [deploy-infrastructure]
       # - run-migrations:
       #     requires: [configure-infrastructure]
       # - deploy-frontend:
