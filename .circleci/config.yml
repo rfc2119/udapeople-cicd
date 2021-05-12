@@ -221,10 +221,11 @@ jobs:
             pip install ansible
       - run:
           name: Configure server
+          working_directory: .circleci/ansible
           command: |
-            cp /tmp/project/.circleci/ansible/inventory.txt .circleci/ansible/
-            cat .circleci/ansible/inventory.txt
-            ansible-playbook .circleci/ansible/configure-server.yml --verbose
+            cp /tmp/project/.circleci/ansible/inventory.txt ./
+            cat inventory.txt
+            ansible-playbook configure-server.yml -i inventory.txt --verbose
             # exit 1
       # Here's where you will add some code to rollback on failure      
 

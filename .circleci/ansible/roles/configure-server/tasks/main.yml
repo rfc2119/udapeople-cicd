@@ -1,6 +1,5 @@
 ---
-# configuring the back-end server
-- name: "Configure the backend server"
+- name: Configure the backend server
   tasks:
     - name: install nodejs
       apt:
