@@ -214,7 +214,7 @@ jobs:
             cat ~/.ssh/*
             ls -l .circleci/ansible/
             cat .circleci/ansible/inventory.txt
-            ls -l /tmp/project
+            ls -al /tmp/project
       - run:
           name: Install dependencies
           command: |
