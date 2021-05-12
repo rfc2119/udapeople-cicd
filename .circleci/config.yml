@@ -153,6 +153,9 @@ jobs:
       ID: << pipeline.parameters.workflow-id >>
     steps:
       - checkout
+      - add_ssh_key:
+          fingerprints:
+            - "13:19:d0:85:aa:eb:66:62:a6:99:db:99:a7:8d:5a:51"
       - run:
           name: Ensure back-end infrastructure exists
           command: |
