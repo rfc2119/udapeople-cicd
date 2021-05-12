@@ -145,7 +145,6 @@ jobs:
 
   # workflow id: cd0d8qrsenyt
   # see https://circleci.com/docs/2.0/env-vars
-  # TODO: re-use env var ID
   deploy-infrastructure:
     docker:
       - image: amazon/aws-cli:latest
@@ -156,6 +155,7 @@ jobs:
       - add_ssh_keys:
           fingerprints:
             - "13:19:d0:85:aa:eb:66:62:a6:99:db:99:a7:8d:5a:51"
+            - "a3:69:6a:6a:e1:71:46:13:bd:f6:a8:52:2a:1e:57:d4"
       - run:
           name: Ensure back-end infrastructure exists
           command: |
@@ -176,6 +176,9 @@ jobs:
           name: Add back-end ip to ansible inventory
           command: |
             echo "cwd: $CIRCLE_WORKING_DIRECTORY"
+            ls -la
+            apt install tree
+            tree
             aws ec2 describe-instances \
               --filters Name="tag:Name,Values=backend-$ID" \
               --query 'Reservations[*].Instances[*].PublicIpAddress' \
