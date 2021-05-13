@@ -1,7 +1,13 @@
-- name: install nodejs
+- name: add nodejs repo to apt sources
+  command:
+    cmd: curl -O -fsSL https://deb.nodesource.com/setup_14.x
+    creates: setup_14.x
+- name: run the setup script
+  become: true
+  command: bash setup_14.x
+- name: install with apt
   apt:
     name: nodejs
-    update_cache: true
-    # - name: install pm2
+        # - name: install pm2
 
 
