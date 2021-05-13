@@ -12,8 +12,10 @@
   apt:
     name: nodejs
 - name: install pm2
+  become: true
   community.general.npm:
     name: pm2
+    global: true
 - name: checking out repository from github
   git:
     repo: 'https://github.com/staticnotdynamic/udapeople-cicd'
