@@ -16,10 +16,19 @@
   community.general.npm:
     name: pm2
     global: true
+- name: checking if repo folder exists
+  stat:
+    path: git/udapeople-cicd
+  register: repo-folder
+- name: remove repo folder if exists
+  file:
+    path: git/udapeople-cicd
+    state: absent
+  when: repo-folder.stat.exists # and repo-folder.stat.isdir
 - name: cloning the repository
-  command:
+  shell:
+    cmd: 'rm -rf udapeople-cicd || git clone https://github.com/staticnotdynamic/udapeople-cicd'
     chdir: git
-    cmd: 'git clone https://github.com/staticnotdynamic/udapeople-cicd'
 - name: install nodejs dependencies for backend
   command:
     chdir: git/udapeople-cicd/backend
