@@ -237,6 +237,7 @@ jobs:
             cp /tmp/project/.circleci/ansible/inventory.txt ./
             echo -e '[web:vars]\nhost_key_checking=false' | tee -a inventory.txt
             cat inventory.txt
+            export ANSIBLE_HOST_KEY_CHECKING=False
             ansible-playbook configure-server.yml \
               -e 'ansible_host_key_checking=false'\
               -e 'ansible_connection=ssh'\
