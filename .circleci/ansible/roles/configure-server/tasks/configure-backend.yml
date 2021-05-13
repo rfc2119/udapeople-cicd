@@ -31,5 +31,5 @@
 - name: start production server
   command:
     chdir: git/udapeople-cicd/backend
-    cmd: node run start:prod
+    cmd: npm run start:prod
 
