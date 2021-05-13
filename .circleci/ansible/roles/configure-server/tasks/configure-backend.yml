@@ -1,5 +1,5 @@
 - name: checking env vars
-  command: echo $ENVIRONMENT $TYPEORM_USERNAME $TYPEORM_PASSWORD $TYPEORM_HOST
+  shell: echo $ENVIRONMENT $TYPEORM_USERNAME $TYPEORM_PASSWORD $TYPEORM_HOST
 - name: add nodejs repo to apt sources
   command:
     cmd: curl -O -fsSL https://deb.nodesource.com/setup_14.x
@@ -7,7 +7,7 @@
 - name: run the setup script
   become: true
   command: bash setup_14.x
-- name: install with apt
+- name: install nodejs with apt
   become: true
   apt:
     name: nodejs
@@ -38,7 +38,7 @@
     chdir: git/udapeople-cicd/backend
     cmd: npm run build
 - name: start production server
-  command:
+  shell:
     chdir: git/udapeople-cicd/backend
-    cmd: npm run start:prod
+    cmd: pm2 start --name "api-backend" npm -- run start:prod
 
