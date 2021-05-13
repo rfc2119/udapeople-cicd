@@ -1,0 +1,7 @@
+- name: install nodejs
+  apt:
+    name: nodejs
+    update_cache: true
+    # - name: install pm2
+
+
