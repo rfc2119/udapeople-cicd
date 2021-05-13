@@ -1,5 +1,10 @@
 - name: checking env vars
-  shell: echo $ENVIRONMENT $TYPEORM_USERNAME $TYPEORM_PASSWORD $TYPEORM_HOST
+  debug:
+    msg:
+      - ENVIRONMENT
+      - " {{ lookup('env', ENVIRONMENT) }} "
+      - TYPEORM_PASSWORD
+      - " {{ lookup('env', TYPEORM_PASSWORD) }} "
 - name: add nodejs repo to apt sources
   command:
     cmd: curl -O -fsSL https://deb.nodesource.com/setup_14.x
@@ -42,3 +47,4 @@
     chdir: git/udapeople-cicd/backend
     cmd: pm2 start --name "api-backend" npm -- run start:prod
 
+    # TODO: systemd and start as a service

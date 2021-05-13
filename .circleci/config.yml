@@ -224,7 +224,6 @@ jobs:
       - save_cache:
           paths: [/home/circleci/.cache/pip]
           key: v2-pip-cache
-
       # TODO: why the duck does ansible not use host_key_checking except from ansible.cfg ?
       - run:
           name: Configure server
@@ -241,22 +240,32 @@ jobs:
             # exit 1
       # Here's where you will add some code to rollback on failure      
 
-#   run-migrations:
-#     docker:
-#       # Docker image here that supports NodeJS
-#     steps:
-#       # Checkout code from git
-#       - run:
-#           name: Run migrations
-#           command: |
-#             # Your code here
-#             exit 1
-#       - run:
-#           name: Send migration results to memstash
-#           command: |
-#             # Your code here
-#             exit 1
-#      # Here's where you will add some code to rollback on failure      
+  run-migrations:
+    docker:
+      - image: cimg/node-13.8.0
+    steps:
+      - checkout
+      - run:
+          name: Run migrations
+          command: |
+            npm run migrations > migrations.out
+            grep "has been executed successfully" migrations.out
+            if [[ $(echo $?) != 0 ]];
+            then
+              echo "migrations ran successfully! notifying memstash"
+              # TODO: start here! what is memstash.io ? how to specify the key ?
+              curl -H "Content-Type: text/plain" \
+                    -H "token: 488b0450-32fc-4365-8f61-e9600d091338" \
+                    --request PUT --data "0" \
+                    https://api.memstash.io/values/
+            fi
+              
+      - run:
+          name: Send migration results to memstash
+          command: |
+            # Your code here
+            exit 1
+     # Here's where you will add some code to rollback on failure      
 
 #   deploy-frontend:
 #     docker:
