@@ -214,12 +214,6 @@ jobs:
       # to other jobs in the same workflow
       - attach_workspace:
           at: /tmp/
-          # - run:
-          #     name: Debugging
-          #     command: |
-          #       ls -l ~/.ssh/
-          #       echo $PWD
-          #       cat ~/.ssh/config
       - restore_cache:
           keys: [v2-pip-cache]
       # TODO: use save/restore cache
@@ -230,6 +224,8 @@ jobs:
       - save_cache:
           paths: [/home/circleci/.cache/pip]
           key: v2-pip-cache
+
+      # TODO: why the duck does ansible not use host_key_checking except from ansible.cfg ?
       - run:
           name: Configure server
           working_directory: .circleci/ansible
@@ -237,11 +233,8 @@ jobs:
             cp /tmp/project/.circleci/ansible/inventory.txt ./
             echo -e '[defaults]\nhost_key_checking = false' | tee ansible.cfg
             # echo -e '[web:vars]\nhost_key_checking=false' | tee -a inventory.txt
-            # cat inventory.txt ansible.cfg
             # export ANSIBLE_HOST_KEY_CHECKING=False
-            ansible-playbook configure-server.yml \
-              -i inventory.txt \
-              -vvvv
+            ansible-playbook configure-server.yml  -i inventory.txt # -vvvv
             #-e 'ansible_host_key_checking=false'\
             # -e 'ansible_connection=ssh'\
             # -e 'ansible_user=ubuntu' \
