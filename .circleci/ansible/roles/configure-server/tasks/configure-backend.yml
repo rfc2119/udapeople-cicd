@@ -1,8 +1,9 @@
 - name: checking env vars
-  debug:
-    msg:
-      - " {{ lookup('env', ENVIRONMENT) }} "
-      - " {{ lookup('env', TYPEORM_PASSWORD) }} "
+  command: echo "$ENVIRONMENT $TYPEORM_PASSWORD"
+  # debug:
+  #   msg:
+  #     - " {{ lookup('env', ENVIRONMENT) }} "
+  #     - " {{ lookup('env', TYPEORM_PASSWORD) }} "
 
 - name: add nodejs repo to apt sources
   command:
