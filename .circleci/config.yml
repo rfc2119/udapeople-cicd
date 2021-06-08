@@ -242,7 +242,7 @@ jobs:
 
   run-migrations:
     docker:
-      - image: cimg/node-13.8.0
+      - image: cimg/node:13.8.0
     environment:
       ID: << pipeline.parameters.workflow-id >>
     steps:
