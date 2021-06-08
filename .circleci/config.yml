@@ -250,6 +250,7 @@ jobs:
       - run:
           name: Run migrations
           command: |
+            cd backend    # migrations script are found at the backend
             npm run migrations > migrations.out
             grep "has been executed successfully" migrations.out
             if [[ $(echo $?) != 0 ]];
@@ -260,6 +261,8 @@ jobs:
                     -H "token: 488b0450-32fc-4365-8f61-e9600d091338" \
                     --request PUT --data "0" \
                     "https://api.memstash.io/values/memstash_key_${ID}"
+              else
+                echo "no migrations have been done"
             fi
               
             # - run:
