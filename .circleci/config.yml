@@ -4,7 +4,7 @@ version: 2.1
 parameters:
   workflow-id:
     type: string
-    default: "cd0d8qrsenyt"
+    default: "cd0d8qrsenyt"   # Hint: RDS auto-generated ID
 
 commands:
   destroy-environment:
@@ -243,6 +243,8 @@ jobs:
   run-migrations:
     docker:
       - image: cimg/node-13.8.0
+    environment:
+      ID: << pipeline.parameters.workflow-id >>
     steps:
       - checkout
       - run:
@@ -257,36 +259,48 @@ jobs:
               curl -H "Content-Type: text/plain" \
                     -H "token: 488b0450-32fc-4365-8f61-e9600d091338" \
                     --request PUT --data "0" \
-                    https://api.memstash.io/values/
+                    "https://api.memstash.io/values/memstash_key_${ID}"
             fi
               
-      - run:
-          name: Send migration results to memstash
-          command: |
-            # Your code here
-            exit 1
+            # - run:
+            #     name: Send migration results to memstash
+            #     command: |
+            #       # Your code here
+            #       exit 1
      # Here's where you will add some code to rollback on failure      
 
-#   deploy-frontend:
-#     docker:
-#       # Docker image here that supports AWS CLI
-#     steps:
-#       # Checkout code from git
-#       - run:
-#           name: Install dependencies
-#           command: |
-#             # your code here
-#       - run:
-#           name: Get backend url
-#           command: |
-#             # your code here
-#             export API_URL="http://${BACKEND_IP}:3030"
-#             echo "${API_URL}"
-#       - run:
-#           name: Deploy frontend objects
-#           command: |
-#             # your code here
-#       # Here's where you will add some code to rollback on failure      
+  deploy-frontend:
+    docker:
+      # Docker image here that supports AWS CLI
+      - image: amazon/aws-cli:latest
+    environment:
+      ID: << pipeline.parameters.workflow-id >>
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            cd frontend
+            npm install webpack # install webpack
+            npm run build
+      - run:
+          name: Get backend url
+          command: |
+            echo "backend ip from ansible: $(cat .circleci/ansible/inventory.txt)"
+            # TODO: inventory.txt will not contain only the backend ip (extract the ip)
+            export BACKEND_IP=$(cat .circleci/ansible/inventory.txt)
+            export API_URL="http://${BACKEND_IP}:3030"
+            echo "Backend API URL: ${API_URL}"
+            npm run build   # bakes the API_URL into the generated code
+      - run:
+          name: Deploy frontend objects
+          command: |
+            # copy the compiled files to our public s3 bucket (destination: bucket/file1)
+            # s3 bucket name is semi hard-coded in files/cloudfront.yml
+            export BUCKET_NAME="udapeople-${ID}"
+            echo "bucket name: $BUCKET_NAME"
+            aws s3 cp frontend/dist s3://${BUCKET_NAME}/ --recursive 
+      # Here's where you will add some code to rollback on failure      
                     
 #   deploy-backend:
 #     docker:
@@ -377,17 +391,17 @@ workflows:
       # - scan-frontend:
       #     requires: [build-frontend]
       - deploy-infrastructure:
-        # TODO: remove me
+        # TODO: remove me in prod (the next line)
         # requires: [test-frontend, test-backend, scan-frontend, scan-backend]
           filters:
             branches:
               only: [deploy-to-prod]
       - configure-infrastructure:
           requires: [deploy-infrastructure]
-      # - run-migrations:
-      #     requires: [configure-infrastructure]
-      # - deploy-frontend:
-      #     requires: [run-migrations]
+      - run-migrations:
+          requires: [configure-infrastructure]
+      - deploy-frontend:
+          requires: [run-migrations]
       # - deploy-backend:
       #     requires: [run-migrations]
       # - smoke-test:
