@@ -4,6 +4,7 @@
     msg:
       - " {{ lookup('env', 'ENVIRONMENT') }} "
       - " {{ lookup('env', 'TYPEORM_PASSWORD') }} "
+      - " {{ lookup('env', 'TYPEORM_HOST') }} "
 
 - name: add nodejs repo to apt sources
   command:
@@ -35,6 +36,11 @@
     path: git/udapeople-cicd
     state: absent
   when: repo_folder.stat.exists # and repo-folder.stat.isdir
+
+- name: creating an empty 'git' directory
+  file:
+    path: git
+    state: directory
 
 - name: cloning the repository
   shell:
