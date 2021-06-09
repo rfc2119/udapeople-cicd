@@ -263,7 +263,7 @@ jobs:
       - run:
           name: Send migration results to memstash
           command: |
-            grep "has been executed successfully" migrations.out
+            grep "has been executed successfully" backend/migrations.out
             if [[ $(echo $?) != 0 ]];
             then
               echo "migrations ran successfully! notifying memstash"
