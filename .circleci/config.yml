@@ -411,7 +411,7 @@ workflows:
           requires: [build-frontend]
       - deploy-infrastructure:
         # TODO: remove me in prod (the next line)
-        requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+          requires: [test-frontend, test-backend, scan-frontend, scan-backend]
           filters:
             branches:
               only: [deploy-to-prod]
