@@ -2,6 +2,7 @@ version: 2.1
 
 # TODO: repeated installation of typescript and webpack
 # NOTE: when ssh'ing into a circleci container, DO NOT specify ssh user
+# NOTE: commands run in containers are run by a priviliged user
 # on the command line. ssh -p 64535 -i <keyfile> 34.224.101.194
 #
 # pipeline variables
@@ -184,7 +185,9 @@ jobs:
             aws ec2 describe-instances \
               --filters Name="tag:Name,Values=backend-$ID" \
               --query 'Reservations[*].Instances[*].PublicIpAddress' \
-              --output text | tee -a .circleci/ansible/inventory.txt
+              --output text | tee .circleci/ansible/inventory.txt
+            # TODO: you should append to the inventory, not overwrite
+            # this works because we've only one host, but it fails to scale
             # $CIRCLE_WORKING_DIRECTORY defaults to "project"
             # see https://circleci.com/docs/2.0/configuration-reference/#jobs
       # this step requires tar and gzip to be installed on the image
@@ -298,9 +301,9 @@ jobs:
       - run:
           name: Install docker image dependencies (and attach_workspace)
           command: |
-            yum install -y tar gzip
             curl -O https://rpm.nodesource.com/setup_14.x   # saves output as setup_14.x
             bash setup_14.x
+            yum install -y tar gzip nodejs
             # cd frontend
             # npm install webpack # install webpack
             # npm run build
