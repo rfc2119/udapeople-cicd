@@ -52,6 +52,11 @@
     chdir: git/udapeople-cicd/backend
     cmd: npm i
 
+- name: install typescript for nodejs
+  command:
+    chdir: git/udapeople-cicd/backend
+    cmd: npm install typescript
+
 - name: build backend
   command:
     chdir: git/udapeople-cicd/backend
