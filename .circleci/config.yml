@@ -248,12 +248,13 @@ jobs:
       ID: << pipeline.parameters.workflow-id >>
     steps:
       - checkout
+      - restore_cache:
+          keys: [backend-build]
       - run:
           name: Run migrations
           no_output_timeout: 15m
           command: |
             cd backend    # migrations script are found at the backend
-            npm install typescript  # install typescript (no need to install ALL packages)
             rm .env   # use environment variables provided by circleci ?
             npm run migrations > migrations.out
             grep "has been executed successfully" migrations.out
@@ -293,12 +294,14 @@ jobs:
       ID: << pipeline.parameters.workflow-id >>
     steps:
       - checkout
-      - run:
-          name: Install dependencies
-          command: |
-            cd frontend
-            npm install webpack # install webpack
-            npm run build
+      - restore_cache:
+          keys: [frontend-build]
+      # - run:
+      #     name: Install dependencies
+      #     command: |
+      #       cd frontend
+      #       npm install webpack # install webpack
+      #       npm run build
       - run:
           name: Get backend url
           command: |
@@ -408,7 +411,7 @@ workflows:
           requires: [build-frontend]
       - deploy-infrastructure:
         # TODO: remove me in prod (the next line)
-         requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+        requires: [test-frontend, test-backend, scan-frontend, scan-backend]
           filters:
             branches:
               only: [deploy-to-prod]
