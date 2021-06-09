@@ -28,43 +28,37 @@
 
 - name: checking if repo folder exists
   stat:
-    path: git/udapeople-cicd
+    path: udapeople-cicd
   register: repo_folder
 
 - name: remove repo folder if exists
   file:
-    path: git/udapeople-cicd
+    path: udapeople-cicd
     state: absent
   when: repo_folder.stat.exists # and repo-folder.stat.isdir
-
-- name: creating an empty 'git' directory
-  file:
-    path: git
-    state: directory
 
 - name: cloning the repository
   shell:
     cmd: 'git clone https://github.com/staticnotdynamic/udapeople-cicd'
-    chdir: git
 
 - name: install nodejs dependencies for backend
   command:
-    chdir: git/udapeople-cicd/backend
+    chdir: udapeople-cicd/backend
     cmd: npm i
 
 - name: install typescript for nodejs
   command:
-    chdir: git/udapeople-cicd/backend
+    chdir: udapeople-cicd/backend
     cmd: npm install typescript
 
 - name: build backend
   command:
-    chdir: git/udapeople-cicd/backend
+    chdir: udapeople-cicd/backend
     cmd: npm run build
 
 - name: start production server
   shell:
-    chdir: git/udapeople-cicd/backend
+    chdir: udapeople-cicd/backend
     cmd: pm2 start --name "api-backend" npm -- run start:prod
 
     # TODO: systemd and start as a service
