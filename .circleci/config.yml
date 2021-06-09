@@ -293,18 +293,19 @@ jobs:
       ID: << pipeline.parameters.workflow-id >>
     steps:
       - checkout
-      - attach_workspace:
-          at: ~/
       - restore_cache:
           keys: [frontend-build]
       - run:
-          name: Install docker image dependencies
+          name: Install docker image dependencies (and attach_workspace)
           command: |
+            yum install -y tar gzip
             curl -O https://rpm.nodesource.com/setup_14.x   # saves output as setup_14.x
             sudo bash setup_14.x
             # cd frontend
             # npm install webpack # install webpack
             # npm run build
+      - attach_workspace:
+          at: ~/
       - run:
           name: Get backend url
           command: |
