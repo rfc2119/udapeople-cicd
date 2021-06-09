@@ -246,6 +246,15 @@ jobs:
       - image: cimg/node:13.8.0
     environment:
       ID: << pipeline.parameters.workflow-id >>
+      TYPEORM_CONNECTION: $TYPEORM_CONNECTION
+      TYPEORM_MIGRATIONS_DIR: $TYPEORM_MIGRATIONS_DIR
+      TYPEORM_ENTITIES: $TYPEORM_ENTITIES
+      TYPEORM_MIGRATIONS: $TYPEORM_MIGRATIONS
+      TYPEORM_HOST: $TYPEORM_HOST
+      TYPEORM_PORT: $TYPEORM_PORT
+      TYPEORM_USERNAME: $TYPEORM_USERNAME
+      TYPEORM_PASSWORD: $TYPEORM_PASSWORD
+      TYPEORM_DATABASE: $TYPEORM_DATABASE
     steps:
       - checkout
       - restore_cache:
@@ -255,7 +264,17 @@ jobs:
           no_output_timeout: 15m
           command: |
             cd backend    # migrations script are found at the backend
-            rm .env   # use environment variables provided by circleci ?
+            # ========== halp
+            echo $TYPEORM_CONNECTION | tee .env
+            echo $TYPEORM_MIGRATIONS_DIR | tee -a .env
+            echo $TYPEORM_ENTITIES | tee -a .env
+            echo $TYPEORM_MIGRATIONS | tee -a .env
+            echo $TYPEORM_HOST | tee -a .env
+            echo $TYPEORM_PORT | tee -a .env
+            echo $TYPEORM_USERNAME | tee -a .env
+            echo $TYPEORM_PASSWORD | tee -a .env
+            echo $TYPEORM_DATABASE | tee -a .env
+            # ========= end halp
             npm run migrations > migrations.out
             grep "has been executed successfully" migrations.out
             if [[ $(echo $?) != 0 ]];
@@ -283,7 +302,7 @@ jobs:
             # sudo apt install tree 
             # tree
             ls -la
-            cat backend/migration.txt
+            cat backend/migration.out
      # Here's where you will add some code to rollback on failure      
 
   deploy-frontend:
