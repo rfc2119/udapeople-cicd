@@ -256,15 +256,15 @@ jobs:
           command: |
             cd backend    # migrations script are found at the backend
             # ========== halp
-            echo $TYPEORM_CONNECTION | tee .env
-            echo $TYPEORM_MIGRATIONS_DIR | tee -a .env
-            echo $TYPEORM_ENTITIES | tee -a .env
-            echo $TYPEORM_MIGRATIONS | tee -a .env
-            echo $TYPEORM_HOST | tee -a .env
-            echo $TYPEORM_PORT | tee -a .env
-            echo $TYPEORM_USERNAME | tee -a .env
-            echo $TYPEORM_PASSWORD | tee -a .env
-            echo $TYPEORM_DATABASE | tee -a .env
+            echo "TYPEORM_CONNECTION=$TYPEORM_CONNECTION" | tee .env
+            echo "TYPEORM_MIGRATIONS_DIR=$TYPEORM_MIGRATIONS_DIR" | tee -a .env
+            echo "TYPEORM_ENTITIES=$TYPEORM_ENTITIES" | tee -a .env
+            echo "TYPEORM_MIGRATIONS=$TYPEORM_MIGRATIONS" | tee -a .env
+            echo "TYPEORM_HOST=$TYPEORM_HOST" | tee -a .env
+            echo "TYPEORM_PORT=$TYPEORM_PORT" | tee -a .env
+            echo "TYPEORM_USERNAME=$TYPEORM_USERNAME" | tee -a .env
+            echo "TYPEORM_PASSWORD=$TYPEORM_PASSWORD" | tee -a .env
+            echo "TYPEORM_DATABASE=$TYPEORM_DATABASE" | tee -a .env
             # ========= end halp
             npm run migrations > migrations.out
             grep "has been executed successfully" migrations.out
