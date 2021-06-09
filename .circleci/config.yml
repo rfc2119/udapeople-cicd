@@ -250,9 +250,11 @@ jobs:
       - checkout
       - run:
           name: Run migrations
+          no_output_timeout: 15m
           command: |
             cd backend    # migrations script are found at the backend
             npm install typescript  # install typescript (no need to install ALL packages)
+            rm .env   # use environment variables provided by circleci ?
             npm run migrations > migrations.out
             grep "has been executed successfully" migrations.out
             if [[ $(echo $?) != 0 ]];
