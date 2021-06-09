@@ -274,6 +274,15 @@ jobs:
             #     command: |
             #       # Your code here
             #       exit 1
+			- run:
+          name: LogOnFail
+          when: on_fail
+          command: |
+            cat /home/circleci/.npm/_logs/*-debug.log
+            # sudo apt install tree 
+            # tree
+            ls -la
+            cat backend/migration.txt
      # Here's where you will add some code to rollback on failure      
 
   deploy-frontend:
