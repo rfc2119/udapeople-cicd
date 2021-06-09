@@ -202,7 +202,7 @@ jobs:
       # Docker image here that supports Ansible
       # image: python:3.7-slim-buster
       # based on circleci's cimg/base which is an optimized ubuntu image
-      - image: cimg/python:3.7
+      - image: cimg/python:3.8
     steps:
       # Checkout code from git
       - checkout
@@ -223,7 +223,6 @@ jobs:
           at: /tmp/
       - restore_cache:
           keys: [v2-pip-cache]
-      # TODO: use save/restore cache
       - run:
           name: Install dependencies
           command: |
@@ -330,22 +329,31 @@ jobs:
             aws s3 cp frontend/dist s3://${BUCKET_NAME}/ --recursive 
       # Here's where you will add some code to rollback on failure      
                     
-#   deploy-backend:
-#     docker:
-#       # Docker image here that supports Ansible
-#     steps:
-#       # Checkout code from git
-#       # Add ssh keys with fingerprint
-#       # attach workspace
-#       - run:
-#           name: Install dependencies
-#           command: |
-#             # your code here
-#       - run:
-#           name: Deploy backend
-#           command: |
-#             # your code here
-#       # Here's where you will add some code to rollback on failure  
+  deploy-backend:
+    docker:
+      - image: cimg/python:3.7
+      # Docker image here that supports Ansible
+    steps:
+      # Checkout code from git
+      - checkout
+      # Add ssh keys with fingerprint
+      - add_ssh_keys:
+          fingerprints:
+            - "13:19:d0:85:aa:eb:66:62:a6:99:db:99:a7:8d:5a:51"   # udacity project 3 key
+      # attach workspace
+      - attach_workspace:
+          at: ~/
+      - restore_cache:
+          keys: [v2-pip-cache]
+      - run:
+          name: Install dependencies
+          command: |
+            pip install ansible
+      - run:
+          name: Deploy backend
+          command: |
+            # your code here
+      # Here's where you will add some code to rollback on failure  
 
 #   smoke-test:
 #     docker:
