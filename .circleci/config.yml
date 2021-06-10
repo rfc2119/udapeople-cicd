@@ -352,18 +352,25 @@ jobs:
             - backend-build
             - v2-pip-cache
       - run:
-          name: Install dependencies
+          name: Install ansible and rsync
           command: |
             pip install ansible
             sudo apt update && sudo apt install -y rsync
-      - build-backend
+      - run:
+          name: Install node and build backend (refactor me)
+            curl -O https://deb.nodesource.com/setup_14.x   # saves output as setup_14.x
+            sudo bash setup_14.x
+            sudo apt install -y nodejs
+            cd backend
+            npm install typescript  # install typescript (no need to install ALL packages)
+            npm run build
       - run:
           name: Deploy backend
           working_directory: .circleci/ansible/
           command: |
             # echo "inventory: $(cat inventory.txt)"
             # echo "ansible cfg: $(cat ansible.cfg)"
-            ls -la ../backend/
+            ls -la ../../backend/
             # cat ~/.ssh/*
             ansible-playbook deploy-backend.yml -i inventory.txt -vv
       # Here's where you will add some code to rollback on failure  
@@ -430,7 +437,7 @@ workflows:
   default:
     jobs:
       # - build-frontend
-      - build-backend
+      # - build-backend
       # - test-frontend:
       #     requires: [build-frontend]
       # - test-backend:
@@ -442,7 +449,7 @@ workflows:
       - deploy-infrastructure:
         # TODO: remove me in prod (the next line)
           # requires: [test-frontend, test-backend, scan-frontend, scan-backend]
-          requires: [build-backend]
+          # requires: [build-backend]
           filters:
             branches:
               only: [deploy-to-prod-tmp]
