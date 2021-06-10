@@ -180,21 +180,25 @@ jobs:
               --parameter-overrides ID=$ID
       - run:
           name: Add back-end ip to ansible inventory
+          working_directory: .circleci/ansible
           command: |
             echo "cwd: $CIRCLE_WORKING_DIRECTORY"
             aws ec2 describe-instances \
               --filters Name="tag:Name,Values=backend-$ID" \
               --query 'Reservations[*].Instances[*].PublicIpAddress' \
-              --output text | tee .circleci/ansible/inventory.txt
+              --output text | tee inventory.txt
             # TODO: you should append to the inventory, not overwrite
             # this works because we've only one host, but it fails to scale
             # $CIRCLE_WORKING_DIRECTORY defaults to "project"
             # see https://circleci.com/docs/2.0/configuration-reference/#jobs
+            echo -e '[defaults]\nhost_key_checking = false' | tee ansible.cfg
+
       # this step requires tar and gzip to be installed on the image
       - persist_to_workspace:
           root: ~/
           paths:
             - project/.circleci/ansible/inventory.txt
+            - project/.circleci/ansible/ansible.cfg
       # Here's where you will add some code to rollback on failure      
 
   configure-infrastructure:
@@ -220,7 +224,7 @@ jobs:
       # The workspace can be used to pass along unique data built during a job
       # to other jobs in the same workflow
       - attach_workspace:
-          at: /tmp/
+          at: ~/              # TODO: redundant ?
       - restore_cache:
           keys: [v2-pip-cache]
       - run:
@@ -236,7 +240,7 @@ jobs:
           no_output_timeout: 30m
           working_directory: .circleci/ansible
           command: |
-            cp /tmp/project/.circleci/ansible/inventory.txt ./  # TODO: redundant ?
+            # cp /tmp/project/.circleci/ansible/inventory.txt ./  # TODO: redundant ?
             echo -e '[defaults]\nhost_key_checking = false' | tee ansible.cfg
             # echo -e '[web:vars]\nhost_key_checking=false' | tee -a inventory.txt
             # export ANSIBLE_HOST_KEY_CHECKING=False
@@ -332,7 +336,7 @@ jobs:
                     
   deploy-backend:
     docker:
-      - image: cimg/python:3.7
+      - image: cimg/python:3.8
       # Docker image here that supports Ansible
     steps:
       # Checkout code from git
@@ -345,7 +349,7 @@ jobs:
       - attach_workspace:
           at: ~/
       - restore_cache:
-          keys: [v2-pip-cache]
+          keys: [v2-pip-cache, backend-build]
       - run:
           name: Install dependencies
           command: |
@@ -354,6 +358,7 @@ jobs:
           name: Deploy backend
           command: |
             # your code here
+            ansible-playbook deploy-backend.yml -i inventory.txt -vvvv
       # Here's where you will add some code to rollback on failure  
 
 #   smoke-test:
