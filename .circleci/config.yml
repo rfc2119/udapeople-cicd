@@ -300,8 +300,6 @@ jobs:
       ID: << pipeline.parameters.workflow-id >>
     steps:
       - checkout
-      - restore_cache:
-          keys: [frontend-build]
       - run:
           name: Install docker image dependencies (and attach_workspace)
           command: |
@@ -313,6 +311,8 @@ jobs:
             # npm run build
       - attach_workspace:
           at: ~/
+      - restore_cache:
+          keys: [frontend-build]
       - run:
           name: Get backend url and bake it into the frontend code
           command: |
