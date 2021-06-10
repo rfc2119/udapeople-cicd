@@ -265,7 +265,6 @@ jobs:
           command: |
             cd backend    # migrations script are found at the backend
             npm run migrations | tee migrations.out
-
       - run:
           name: Send migration results to memstash
           command: |
@@ -279,7 +278,6 @@ jobs:
               else
                 echo "no migrations have been done"
             fi
-
       - run:
           name: LogOnFail
           when: on_fail
@@ -378,28 +376,39 @@ jobs:
             ansible-playbook deploy-backend.yml -i inventory.txt -vv
       # Here's where you will add some code to rollback on failure  
 
-#   smoke-test:
-#     docker:
-#       # Lightweight Docker image 
-#     steps:
-#       # Checkout code from git
-#       - run:
-#           name: Install dependencies
-#           command: |
-#             # your code here
-#       - run:
-#           name: Get backend url
-#           command: |
-#             # your code here
-#       - run:
-#           name: Backend smoke test.
-#           command: |
-#             # your code here
-#       - run:
-#           name: Frontend smoke test.
-#           command: |
-#             # your code here
-#       # Here's where you will add some code to rollback on failure  
+  smoke-test:
+    docker:
+      - image: alpine:latest
+    environment:
+      ID: << pipeline.parameters.workflow-id >>
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --no-cache gzip tar curl
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Get backend url
+          working_directory: .circleci/ansible
+          command: |
+            echo "backend ip from ansible: $(cat inventory.txt)"
+            # TODO: inventory.txt will not contain only the backend ip (extract the ip)
+            export BACKEND_IP=$(cat inventory.txt)
+            export API_URL="http://${BACKEND_IP}:3030"
+            echo "Backend API URL: ${API_URL}"
+      - run:
+          name: Backend smoke test.
+          command: |
+            curl -s "$API_URL/api/status"
+      - run:
+          name: Frontend smoke test.
+          command: |
+            # TODO: region is hard-coded
+            FRONTEND_URL="http://udapeople-${ID}.s3-website-ap-northeast-2.amazonaws.com"
+            curl -s ${FRONTEND_URL} | grep "Welcome"    # should return a non-zero rc if failed
+      # Here's where you will add some code to rollback on failure
 
 #   cloudfront-update:
 #     docker:
@@ -455,20 +464,20 @@ workflows:
           # requires: [build-backend]
           filters:
             branches:
-              only: [deploy-to-prod-tmp]
+              only: [smoke-test]
       # - configure-infrastructure:
       #     requires: [deploy-infrastructure]
       # - run-migrations:
       #     # requires: [configure-infrastructure]
       #     requires: [deploy-infrastructure]   # TODO: this is not the correct 'require'. use ^ instead
       - deploy-frontend:
-          requires: [run-migrations]
-          # requires: [deploy-infrastructure]   # TODO: this is not the correct 'require'. use ^ instead
+          # requires: [run-migrations]
+          requires: [deploy-infrastructure]   # TODO: this is not the correct 'require'. use ^ instead
       - deploy-backend:
-          requires: [run-migrations]
-          # requires: [deploy-infrastructure]   # TODO: this is not the correct 'require'. use ^ instead
-      # - smoke-test:
-      #     requires: [deploy-backend, deploy-frontend]
+          # requires: [run-migrations]
+          requires: [deploy-infrastructure]   # TODO: this is not the correct 'require'. use ^ instead
+      - smoke-test:
+          requires: [deploy-backend, deploy-frontend]
       # - cloudfront-update:
       #     requires: [smoke-test]
       # - cleanup:
