@@ -1,6 +1,6 @@
 ---
 
-- name: "configuration play." 
+- name: "Deploy built files to backend" 
   hosts: all
   user: ubuntu
   gather_facts: false
