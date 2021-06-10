@@ -224,7 +224,7 @@ jobs:
       # The workspace can be used to pass along unique data built during a job
       # to other jobs in the same workflow
       - attach_workspace:
-          at: ~/              # TODO: redundant ?
+          at: /              # TODO: redundant ?
       - restore_cache:
           keys: [v2-pip-cache]
       - run:
@@ -310,7 +310,7 @@ jobs:
             # npm install webpack # install webpack
             # npm run build
       - attach_workspace:
-          at: ~/
+          at: /
       - restore_cache:
           keys: [frontend-build]
       - run:
@@ -375,7 +375,7 @@ jobs:
           command: |
             apk add --no-cache curl tar
       - attach_workspace:
-          at: ~/              # TODO: redundant ?
+          at: /              # TODO: redundant ?
       - run:
           name: Get backend url
           command: |
