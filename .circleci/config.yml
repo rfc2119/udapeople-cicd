@@ -237,7 +237,7 @@ jobs:
       # TODO: why the duck does ansible not use host_key_checking except from ansible.cfg ?
       - run:
           name: Configure server
-          no_output_timeout: 30m
+          no_output_timeout: 35m
           working_directory: .circleci/ansible
           command: |
             cp /tmp/project/.circleci/ansible/inventory.txt ./  # TODO: redundant ?
@@ -439,34 +439,34 @@ jobs:
 workflows:
   default:
     jobs:
-      # - build-frontend
-      # - build-backend
-      # - test-frontend:
-      #     requires: [build-frontend]
-      # - test-backend:
-      #     requires: [build-backend]
-      # - scan-backend:
-      #     requires: [build-backend]
-      # - scan-frontend:
-      #     requires: [build-frontend]
+      - build-frontend
+      - build-backend
+      - test-frontend:
+          requires: [build-frontend]
+      - test-backend:
+          requires: [build-backend]
+      - scan-backend:
+          requires: [build-backend]
+      - scan-frontend:
+          requires: [build-frontend]
       - deploy-infrastructure:
         # TODO: remove me in prod (the next line)
-          # requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+          requires: [test-frontend, test-backend, scan-frontend, scan-backend]
           # requires: [build-backend]
           filters:
             branches:
               only: [deploy-to-prod-tmp]
-      # - configure-infrastructure:
-      #     requires: [deploy-infrastructure]
-      # - run-migrations:
-      #     # requires: [configure-infrastructure]
-      #     requires: [deploy-infrastructure]   # TODO: this is not the correct 'require'. use ^ instead
+      - configure-infrastructure:
+          requires: [deploy-infrastructure]
+      - run-migrations:
+          # requires: [configure-infrastructure]
+          requires: [deploy-infrastructure]   # TODO: this is not the correct 'require'. use ^ instead
       - deploy-frontend:
-          # requires: [run-migrations]
-          requires: [deploy-infrastructure]   # TODO: this is not the correct 'require'. use ^ instead
+          requires: [run-migrations]
+          # requires: [deploy-infrastructure]   # TODO: this is not the correct 'require'. use ^ instead
       - deploy-backend:
-      #     requires: [run-migrations]
-          requires: [deploy-infrastructure]   # TODO: this is not the correct 'require'. use ^ instead
+          requires: [run-migrations]
+          # requires: [deploy-infrastructure]   # TODO: this is not the correct 'require'. use ^ instead
       # - smoke-test:
       #     requires: [deploy-backend, deploy-frontend]
       # - cloudfront-update:
