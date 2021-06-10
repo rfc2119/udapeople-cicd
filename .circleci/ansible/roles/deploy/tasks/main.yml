@@ -24,3 +24,8 @@
     chdir: udapeople-cicd/backend
     cmd: pm2 start --name "api-backend" npm -- run start:prod
     # TODO: systemd and start as a service
+
+    # TODO: wgat us tge dufferebce ?
+- name: start dist/main.js
+  chdir: udapeople-cicd/backend/dist
+  shell: pm2 start main.js
