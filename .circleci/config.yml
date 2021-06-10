@@ -384,7 +384,7 @@ jobs:
       - run:
           name: Backend smoke test.
           command: |
-            curl $API_URL/api/status
+            curl -s "$API_URL/api/status"
       - run:
           name: Frontend smoke test.
           command: |
