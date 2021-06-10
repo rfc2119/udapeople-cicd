@@ -356,6 +356,7 @@ jobs:
             pip install ansible
       - run:
           name: Deploy backend
+          working_directory: .circleci/ansible/
           command: |
             # your code here
             ansible-playbook deploy-backend.yml -i inventory.txt -vvvv
