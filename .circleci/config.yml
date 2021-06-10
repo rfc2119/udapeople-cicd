@@ -314,7 +314,7 @@ jobs:
       - attach_workspace:
           at: ~/
       - run:
-          name: Get backend url
+          name: Get backend url and bake it into the frontend code
           command: |
             echo "backend ip from ansible: $(cat .circleci/ansible/inventory.txt)"
             # TODO: inventory.txt will not contain only the backend ip (extract the ip)
@@ -361,28 +361,41 @@ jobs:
             ansible-playbook deploy-backend.yml -i inventory.txt -vvvv
       # Here's where you will add some code to rollback on failure  
 
-#   smoke-test:
-#     docker:
-#       # Lightweight Docker image 
-#     steps:
-#       # Checkout code from git
-#       - run:
-#           name: Install dependencies
-#           command: |
-#             # your code here
-#       - run:
-#           name: Get backend url
-#           command: |
-#             # your code here
-#       - run:
-#           name: Backend smoke test.
-#           command: |
-#             # your code here
-#       - run:
-#           name: Frontend smoke test.
-#           command: |
-#             # your code here
-#       # Here's where you will add some code to rollback on failure  
+  smoke-test:
+    docker:
+      # Lightweight Docker image
+      - image: alpine:latest
+    environment:
+      ID: << pipeline.parameters.workflow-id >>
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --no-cache curl tar
+      - attach_workspace:
+          at: ~/              # TODO: redundant ?
+      - run:
+          name: Get backend url
+          command: |
+            export BACKEND_IP=$(cat .circleci/ansible/inventory.txt)
+            export API_URL="http://${BACKEND_IP}:3030"
+      - run:
+          name: Backend smoke test.
+          command: |
+            curl $API_URL/api/status
+      - run:
+          name: Frontend smoke test.
+          command: |
+            # TODO: region
+            export FRONTEND_URL="http://udapeople-${ID}.s3-website-ap-northeast-2.amazonaws.com"
+            if curl -s ${FRONTEND_URL} | grep "Welcome";
+            then
+              return 1
+            else
+              return 0
+            fi
+      # Here's where you will add some code to rollback on failure
 
 #   cloudfront-update:
 #     docker:
@@ -444,12 +457,12 @@ workflows:
       - run-migrations:
         # requires: [configure-infrastructure]
           requires: [deploy-infrastructure]   # TODO: this is not the correct 'require'. use ^ instead
-      - deploy-frontend:
-          requires: [run-migrations]
-      # - deploy-backend:
-      #     requires: [run-migrations]
-      # - smoke-test:
-      #     requires: [deploy-backend, deploy-frontend]
+      - deploy-frontend
+          # requires: [run-migrations]
+      - deploy-backend
+          # requires: [run-migrations]
+      - smoke-test:
+          requires: [deploy-backend, deploy-frontend]
       # - cloudfront-update:
       #     requires: [smoke-test]
       # - cleanup:
