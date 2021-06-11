@@ -1,19 +1,19 @@
-- name: checking env vars
-  # command: echo "$ENVIRONMENT $TYPEORM_PASSWORD"
-  debug:
-    msg:
-      - " {{ lookup('env', 'ENVIRONMENT') }} "
-      - " {{ lookup('env', 'TYPEORM_PASSWORD') }} "
-      - " {{ lookup('env', 'TYPEORM_HOST') }} "
+# - name: checking env vars
+#   # command: echo "$ENVIRONMENT $TYPEORM_PASSWORD"
+#   debug:
+#     msg:
+#       - " {{ lookup('env', 'ENVIRONMENT') }} "
+#       - " {{ lookup('env', 'TYPEORM_PASSWORD') }} "
+#       - " {{ lookup('env', 'TYPEORM_HOST') }} "
 
-- name: add nodejs repo to apt sources
+- name: add nodejs 13 repo to apt sources
   command:
-    cmd: curl -O -fsSL https://deb.nodesource.com/setup_14.x
-    creates: setup_14.x
+    cmd: curl -O -fsSL https://deb.nodesource.com/setup_13.x
+    creates: setup_13.x
 
-- name: run the setup script
+- name: run the nodejs setup script
   become: true
-  command: bash -x setup_14.x
+  command: bash setup_13.x
 
 - name: install nodejs and rsync with apt
   become: true
@@ -33,7 +33,7 @@
     path: udapeople-cicd
   register: repo_folder
 
-- name: remove repo folder if exists
+- name: remove repo folder if it exists
   file:
     path: udapeople-cicd
     state: absent
@@ -43,19 +43,19 @@
   shell:
     cmd: 'git clone https://github.com/staticnotdynamic/udapeople-cicd'
 
-- name: install nodejs dependencies for backend
-  command:
-    chdir: udapeople-cicd/backend
-    cmd: npm i
+# - name: install nodejs dependencies for backend
+#   command:
+#     chdir: udapeople-cicd/backend
+#     cmd: npm i
 
-- name: install typescript for nodejs
-  command:
-    chdir: udapeople-cicd/backend
-    cmd: npm install typescript
+# - name: install typescript for nodejs
+#   command:
+#     chdir: udapeople-cicd/backend
+#     cmd: npm install typescript
 
-- name: build backend
-  command:
-    chdir: udapeople-cicd/backend
-    cmd: npm run build
+# - name: build backend
+#   command:
+#     chdir: udapeople-cicd/backend
+#     cmd: npm run build
 
 # TODO: redundunt actions ?

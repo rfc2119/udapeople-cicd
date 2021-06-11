@@ -5,6 +5,7 @@ version: 2.1
 # on the command line. ssh -p 64535 -i <keyfile> 34.224.101.194
 # NOTE: commands run in containers are run by a priviliged user (not all images)
 # NOTE: add_ssh_keys copies the private key(s) from your circleci account
+# NOTE: node v13 is needed to run the backend
 #
 # pipeline variables
 parameters:
@@ -300,8 +301,8 @@ jobs:
       - run:
           name: Install docker image dependencies (and attach_workspace)
           command: |
-            curl -O https://rpm.nodesource.com/setup_14.x   # saves output as setup_14.x
-            bash setup_14.x
+            curl -O https://rpm.nodesource.com/setup_13.x   # saves output as setup_13.x
+            bash setup_13.x
             yum install -y tar gzip nodejs
             # cd frontend
             # npm install webpack # install webpack
@@ -356,8 +357,8 @@ jobs:
       - run:
           name: Install node
           command: |
-            curl -O https://deb.nodesource.com/setup_14.x   # saves output as setup_14.x
-            sudo bash setup_14.x
+            curl -O https://deb.nodesource.com/setup_13.x   # saves output as setup_13.x
+            sudo bash setup_13.x
             sudo apt install -y nodejs
       - restore_cache:
           keys:
@@ -376,7 +377,7 @@ jobs:
             echo "TYPEORM_USERNAME=$TYPEORM_USERNAME" >> .env
             echo "TYPEORM_PASSWORD=$TYPEORM_PASSWORD" >> .env
             echo "TYPEORM_DATABASE=$TYPEORM_DATABASE" >> .env
-            cat .env
+            # cat .env
             npm install typescript  # install typescript (no need to install ALL packages)
             npm run build
       - run:
