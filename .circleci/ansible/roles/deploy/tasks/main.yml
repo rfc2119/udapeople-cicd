@@ -19,8 +19,9 @@
     recursive: yes
     archive: yes
 
-- name: start production server
+- name: start production server (NOT using start:prod script)
   shell:
-    cmd: pm2 start --name "api-backend" npm -- run start:prod
+    # cmd: pm2 start --name "api-backend" npm -- run start:prod
+    cmd: pm2 start --name "api-backend" dist/main.js
     chdir: udapeople-cicd/backend
     # TODO: systemd and start as a service
