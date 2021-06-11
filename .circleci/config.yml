@@ -6,6 +6,12 @@ version: 2.1
 # NOTE: commands run in containers are run by a priviliged user (not all images)
 # NOTE: add_ssh_keys copies the private key(s) from your circleci account
 # NOTE: node v13 is needed to run the backend
+# NOTE: having this syntax error: https://knowledge.udacity.com/questions/345234
+# renders a production build unusable. despite all workarounds, i had to use
+# the 'start' script, i.e "npm run start"
+# following the solution here https://knowledge.udacity.com/questions/489016
+# led me to here https://knowledge.udacity.com/questions/345234 (other import
+# errors) which is unsolved as well
 #
 # pipeline variables
 parameters:
