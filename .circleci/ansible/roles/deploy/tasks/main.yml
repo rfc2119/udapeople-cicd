@@ -5,12 +5,9 @@
     msg:
       - " cwd: {{ lookup('env', 'PWD') }} "
 
-# TODO
-# - name: record whoami
-#   command: whoami
-#   register: os_user
 
-
+# TODO: why do you build at ci/cd side when it's not necessary ?
+# is it to off-load compute time on the backend server ?
 - name: Copy backend built files to backend server
   synchronize:
     # TODO: hard-coded values
@@ -19,6 +16,14 @@
     recursive: yes
     archive: yes
 
+# TODO: install env vars in memory, not as a file
+- name: Copy .env var to backend
+  synchronize:
+    # TODO: hard-coded values
+    src: '/home/circleci/project/backend/.env'
+    dest: udapeople-cicd/backend/
+
+# start:prod invokes prestart:prod which rimraf our rsync'd dist/
 - name: start production server (NOT using start:prod script)
   shell:
     # cmd: pm2 start --name "api-backend" npm -- run start:prod
