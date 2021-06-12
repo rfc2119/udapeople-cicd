@@ -66,6 +66,8 @@ commands:
               - << parameters.install_deps >>
               - on_fail
           steps:
+            - run: echo on_fail
+            - run: echo << parameters.install_deps >>
             - install-awscli-cmd
       - run:
           name: Destroy environments
