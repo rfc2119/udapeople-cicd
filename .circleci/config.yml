@@ -329,12 +329,14 @@ jobs:
           command: |
             if grep -q "has been executed successfully" backend/migrations.out;
             then
+              # TODO: magic data
               echo "migrations ran successfully! notifying memstash"
               curl -H "Content-Type: text/plain" \
                    -H "token: 488b0450-32fc-4365-8f61-e9600d091338" \
                    --request PUT --data "0" \
                    "https://api.memstash.io/values/memstash_key_${ID}"
             else
+              # TODO: magic data
               echo "no migrations have been done"
               curl -H "Content-Type: text/plain" \
                    -H "token: 488b0450-32fc-4365-8f61-e9600d091338" \
@@ -454,7 +456,8 @@ jobs:
             ansible-playbook deploy-backend.yml -i inventory.txt -vv
       # Here's where you will add some code to rollback on failure  
       - revert-migrations
-      - destroy-environment
+      - destroy-environment:
+          install_deps: true
 
   smoke-test:
     docker:
@@ -486,7 +489,8 @@ jobs:
             curl -s ${FRONTEND_URL} | grep "Welcome"    # should return a non-zero rc if failed
       # Here's where you will add some code to rollback on failure
       - revert-migrations
-      - destroy-environment
+      - destroy-environment:
+          install_deps: true
 
 #   cloudfront-update:
 #     docker:
@@ -543,8 +547,8 @@ workflows:
           filters:
             branches:
               only: [cloudfront-update]
-      # - configure-infrastructure:
-      #     requires: [deploy-infrastructure]
+      - configure-infrastructure:
+          requires: [deploy-infrastructure]
       - run-migrations:
           # requires: [configure-infrastructure]
           requires: [deploy-infrastructure]   # TODO: this is not the correct 'require'. use ^ instead
