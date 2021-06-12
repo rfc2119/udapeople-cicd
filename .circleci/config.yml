@@ -12,6 +12,7 @@ version: 2.1
 # following the solution here https://knowledge.udacity.com/questions/489016
 # led me to here https://knowledge.udacity.com/questions/345234 (other import
 # errors) which is unsolved as well
+# NOTE: conditional steps circleci https://circleci.com/docs/2.0/reusing-config/#defining-conditional-steps
 #
 # pipeline variables
 parameters:
@@ -34,8 +35,8 @@ commands:
             # version=$(cat /proc/version)
             # if [[ "$version" =~ "deb" ]]; then
             # if command -v "apk"; then
-            pkg-mgr="<< parameters.pkg-manager >>"
-            case ${pkg-mgr,,} in
+            export pkgmgr="<< parameters.pkg-manager >>"
+            case ${pkgmgr,,} in
               "apt")
                 apt install -y python3 python3-pip;;
               "apk")
