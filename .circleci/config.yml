@@ -21,7 +21,7 @@ parameters:
 
 commands:
   install-awscli-cmd:
-    description: Installs AWS CLI (TODO: needs improvment)
+    description: Installs AWS CLI (TODO needs improvment)
     parameters:
       pkg-manager:
         type: string
