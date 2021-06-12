@@ -35,7 +35,12 @@ commands:
             # version=$(cat /proc/version)
             # if [[ "$version" =~ "deb" ]]; then
             if command -v "apt"; then
-              apt install -y python3 python3-pip
+              CMD="apt install -y python3 python3-pip"
+              if [ "$EUID" -ne 0 ]; then    # must be run by a priviliged user
+                sudo $CMD
+              else
+                $CMD
+              fi
             elif command -v "apk"; then
               apk add python3 python3-pip
             elif command -v "yum"; then
@@ -88,6 +93,8 @@ commands:
               - << parameters.install_deps >>
               - on_fail
           steps:
+            - run: echo on_fail
+            - run: echo << parameters.install_deps >>
             - install-awscli-cmd
       - run:
           name: Revert migrations
