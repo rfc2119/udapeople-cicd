@@ -551,8 +551,8 @@ workflows:
       - configure-infrastructure:
           requires: [deploy-infrastructure]
       - run-migrations:
-          # requires: [configure-infrastructure]
-          requires: [deploy-infrastructure]   # TODO: this is not the correct 'require'. use ^ instead
+          requires: [configure-infrastructure]
+          # requires: [deploy-infrastructure]   # TODO: this is not the correct 'require'. use ^ instead
       - deploy-frontend:
           requires: [run-migrations]
           # requires: [deploy-infrastructure]   # TODO: this is not the correct 'require'. use ^ instead
