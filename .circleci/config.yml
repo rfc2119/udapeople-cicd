@@ -32,6 +32,7 @@ commands:
     steps:
       - run:
           name: Install AWS CLI through Python 3
+          when: on_fail     # TODO: this should not be here
           command: |
             # version=$(cat /proc/version)
             # if [[ "$version" =~ "deb" ]]; then
@@ -61,26 +62,27 @@ commands:
         type: boolean
         default: false
     steps:
-      - run:
-        name: print statement
-        when: on_fail
-        command: echo << parameters.install_deps >> from top-level steps
-      - when:
-          condition:
-            and:
-              - << parameters.install_deps >>
-              # TODO: start here. apparently on_fail inside a when inside steps always evaluates to true ?
-              # find out, and continue to:
-              # 1. work on the cloudfront-update branch. ensure a sane build, and use cloudfront
-              # 2. take scnreenshots and urls
-              # 3. use prometheus and grafana
-              # 4. submit
-              # 5. configure your personal vps to host password store and website
-              # TODO: on_fail
-              - on_fail
-          steps:
-            - run: echo << parameters.install_deps >> from 'when' step
-            - install-awscli-cmd
+      # - run:
+      #   name: print statement
+      #   when: on_fail
+      #   command: echo << parameters.install_deps >> from top-level steps
+      - install-awscli-cmd
+      # - when:
+      #     condition:
+      #       and:
+      #         - <<parameters.install_deps>>
+      #         # TODO: start here. apparently on_fail inside a when inside steps always evaluates to true ?
+      #         # find out, and continue to:
+      #         # 1. work on the cloudfront-update branch. ensure a sane build, and use cloudfront
+      #         # 2. take scnreenshots and urls
+      #         # 3. use prometheus and grafana
+      #         # 4. submit
+      #         # 5. configure your personal vps to host password store and website
+      #         # TODO: on_fail in logical statement (type Logical) is not the same as on_fail elsewhere
+      #         - on_fail
+      #     steps:
+      #       - run: echo << parameters.install_deps >> from 'when' step
+      #       - install-awscli-cmd
       - run:
           name: Destroy environments
           when: on_fail   # will this works ?
@@ -108,6 +110,7 @@ commands:
             # TODO: hard-coded token
             SUCCESS=$( curl -H "token: 488b0450-32fc-4365-8f61-e9600d091338" \
                   "https://api.memstash.io/values/memstash_key_${<< parameters.id >>}" )
+            # POSIX-complaint if condition (shell in alpine does not support (( )) )
             if [ "$SUCCESS" -ne 0 ];  # 0 for success, non-zero for failure
             then
               cd ~/project/backend
