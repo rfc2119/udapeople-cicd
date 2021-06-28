@@ -111,12 +111,13 @@ commands:
             SUCCESS=$( curl -H "token: 488b0450-32fc-4365-8f61-e9600d091338" \
                   "https://api.memstash.io/values/memstash_key_${<< parameters.id >>}" )
             # POSIX-complaint if condition (shell in alpine does not support (( )) )
-            if [ "$SUCCESS" -ne 0 ];  # 0 for success, non-zero for failure
+            if [ "$SUCCESS" -eq 0 ];  # 0 for success, non-zero for failure
             then
               cd ~/project/backend
               npm install
               npm run migrations:revert
             fi
+
             
 jobs:
   build-frontend:
