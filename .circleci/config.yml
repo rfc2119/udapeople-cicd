@@ -19,7 +19,8 @@ version: 2.1
 parameters:
   workflow-id:
     type: string
-    default: "cd0d8qrsenyt"   # Hint: RDS auto-generated ID
+    # default: "cd0d8qrsenyt"   # for dev and testing. hint: RDS auto-generated ID
+    default: << pipeline.number >>    # prod workflow id
 
 commands:
   # TODO: needs improvment
@@ -89,7 +90,7 @@ commands:
           command: |
             aws cloudformation delete-stack --stack-name udapeople-frontend-${<< parameters.id >>}
             aws cloudformation delete-stack --stack-name udapeople-backend-${<< parameters.id >>}
-            aws cloudformation delete-stack --stack-name udapeople-cloudfront-s3-${<< parameters.id >>}
+            aws cloudformation delete-stack --stack-name udapeople-cloudfront
             aws s3 rm s3://udapeople-${<< parameters.id >>}/ --recursive
 
   revert-migrations:
@@ -108,10 +109,10 @@ commands:
           command: |
             # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
             # TODO: hard-coded token
-            SUCCESS=$( curl -H "token: 488b0450-32fc-4365-8f61-e9600d091338" \
+            MIGRATIONS_DONE=$( curl -H "token: 488b0450-32fc-4365-8f61-e9600d091338" \
                   "https://api.memstash.io/values/memstash_key_${<< parameters.id >>}" )
             # POSIX-complaint if condition (shell in alpine does not support (( )) )
-            if [ "$SUCCESS" -eq 0 ];  # 0 for success, non-zero for failure
+            if [ "$MIGRATIONS_DONE" -eq 0 ];  # 0 for success, non-zero for anything else
             then
               cd ~/project/backend
               npm install
@@ -512,20 +513,46 @@ jobs:
       - destroy-environment:
           install_deps: true
 
-#   cloudfront-update:
-#     docker:
-#       # Docker image here that supports AWS CLI
-#     steps:
-#       # Checkout code from git
-#       - run:
-#           name: Install dependencies
-#           command: |
-#             # your code here
-#       - run:
-#           name: Update cloudfront distribution
-#           command: |
-#             # your code here
-#       # Here's where you will add some code to rollback on failure  
+  cloudfront-update:
+    docker:
+     - image: amazon/aws-cli:latest
+    environment:
+      PROD_WORKFLOW_ID: << pipeline.parameters.workflow-id >>
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            # your code here
+      - run:
+          name: Update cloudfront distribution
+          command: |
+            export DEV_WORKFLOW_ID=$(aws cloudformation list-exports \ 
+                  --query "Exports[?Name=='WorkflowID'].Value" \
+                  --no-paginate --output text)
+            echo "old id: $DEV_WORKFLOW_ID; new: $PROD_WORKFLOW_ID"
+            if [[ "$DEV_WORKFLOW_ID" != "$PROD_WORKFLOW_ID" ]]
+            then
+              echo "Update existing CloudFront stack with the new id"
+              aws cloudformation update-stack  \
+                --stack-name udapeople-cloudfront \
+                --use-previous-template
+                --parameters ParameterKey=WorkflowID,ParameterValue=${PROD_WORKFLOW_ID}
+              # else              
+              # echo "Create CloudFront stack"
+              # aws cloudformation create-stack  \
+              #   --stack-name udapeople-cloudfront \
+              #   --template-body file://./.circleci/files/cloudfront.yml \
+              #   --parameters ParameterKey=WorkflowID,ParameterValue=${CIRCLE_WORKFLOW_ID:0:7} \
+              #   --tags 'Key=project,Value=udapeople'            
+              echo "Empty old S3 bucket and delete old frontend stack"
+              aws s3 rm s3://udapeople-frontend-$DEV_WORKFLOW_ID/ --recursive
+              aws cloudformation delete-stack --stack-name udapeople-frontend-$DEV_WORKFLOW_ID
+              echo "Delete old backend stack"
+              aws cloudformation delete-stack --stack-name udapeople-backend-$DEV_WORKFLOW_ID
+
+            fi
+      # Here's where you will add some code to rollback on failure
 
 # cleanup:
 #     docker:
