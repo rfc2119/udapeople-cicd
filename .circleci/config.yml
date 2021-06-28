@@ -98,7 +98,7 @@ commands:
           name: Update bash
           when: on_fail
           command: |
-            if [ command -v "apk" ]; then
+            if command -v "apk"; then
               apk add --upgrade bash
             fi
       - run:
