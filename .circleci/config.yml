@@ -109,7 +109,7 @@ commands:
             # TODO: hard-coded token
             SUCCESS=$( curl -H "token: 488b0450-32fc-4365-8f61-e9600d091338" \
                   "https://api.memstash.io/values/memstash_key_${<< parameters.id >>}" )
-            if [ "$SUCCESS" -gt 0 ];  # 0 for success, non-zero for failure
+            if [ "$SUCCESS" -ne 0 ];  # 0 for success, non-zero for failure
             then
               cd ~/project/backend
               npm install
@@ -485,6 +485,8 @@ jobs:
           name: Install dependencies
           command: |
             apk add --no-cache gzip tar curl
+            # NOTE: used for reverting migrations if failed
+            apk add --no-cache nodejs npm       # TODO: specify nodejs version
       - attach_workspace:
           at: ~/
       - run:
