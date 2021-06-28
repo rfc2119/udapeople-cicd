@@ -74,7 +74,9 @@ commands:
               # 5. configure your personal vps to host password store and website
               # TODO: on_fail
               # - on_fail
-          steps: install-awscli-cmd
+          steps:
+            - run: echo << parameters.install_deps >>
+            - install-awscli-cmd
       - run:
           name: Destroy environments
           when: on_fail   # will this works ?
