@@ -62,9 +62,9 @@ commands:
         default: false
     steps:
       - when:
-          condition: << parameters.install_deps >>
-            # and:
-              # - << parameters.install_deps >>
+          condition:
+            and:
+              - << parameters.install_deps >>
               # TODO: start here. apparently on_fail inside a when inside steps always evaluates to true ?
               # find out, and continue to:
               # 1. work on the cloudfront-update branch. ensure a sane build, and use cloudfront
@@ -73,7 +73,7 @@ commands:
               # 4. submit
               # 5. configure your personal vps to host password store and website
               # TODO: on_fail
-              # - on_fail
+              - on_fail
           steps:
             - run: echo << parameters.install_deps >>
             - install-awscli-cmd
