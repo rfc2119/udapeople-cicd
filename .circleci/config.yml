@@ -62,9 +62,9 @@ commands:
         default: false
     steps:
       - run:
-        name: print statement
-        when: on_fail
-        command: echo << parameters.install_deps >> from top-level steps
+          name: print statement
+          when: on_fail
+          command: echo << parameters.install_deps >> from top-level steps
       - when:
           condition:
             and:
