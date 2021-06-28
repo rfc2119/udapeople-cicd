@@ -274,6 +274,7 @@ jobs:
       # Here's where you will add some code to rollback on failure      
       - destroy-environment
 
+        # TODO: delete previously deployed backend apps with pm2
   configure-infrastructure:
     docker:
       # Docker image here that supports Ansible
@@ -566,9 +567,9 @@ workflows:
               only: [cloudfront-update]
       # - configure-infrastructure:
       #     requires: [deploy-infrastructure]
-      # - run-migrations:
-      #     requires: [configure-infrastructure]
-      #     # requires: [deploy-infrastructure]   # TODO: this is not the correct 'require'. use ^ instead
+      - run-migrations:
+          # requires: [configure-infrastructure]
+          requires: [deploy-infrastructure]   # TODO: this is not the correct 'require'. use ^ instead
       - deploy-frontend:
           requires: [run-migrations]
           # requires: [deploy-infrastructure]   # TODO: this is not the correct 'require'. use ^ instead
