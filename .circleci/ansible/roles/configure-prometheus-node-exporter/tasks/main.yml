@@ -1,7 +1,7 @@
 - name: "create node_exporter user"
   user:
     name: node_exporter
-    group: node_exporter
+    # group: node_exporter
     create_home: no
 
 - name: "install node exporter."
