@@ -521,8 +521,9 @@ jobs:
               exit 1
             fi
       - revert-migrations
-        # - destroy-environment:
-        #     install_deps: true
+      # TODO: uncomment me at prod
+      # - destroy-environment:
+      #     install_deps: true
 
   cloudfront-update:
     docker:
@@ -538,17 +539,12 @@ jobs:
       - run:
           name: Update cloudfront distribution
           command: |
-            export DEV_WORKFLOW_ID=$(aws cloudformation list-exports \ 
-                  --query "Exports[?Name=='WorkflowID'].Value" \
-                  --no-paginate --output text)
+            export DEV_WORKFLOW_ID=$(aws cloudformation list-exports --query "Exports[?Name=='WorkflowID'].Value" --no-paginate --output text)
             echo "old id: $DEV_WORKFLOW_ID; new: $PROD_WORKFLOW_ID"
             if [[ "$DEV_WORKFLOW_ID" != "$PROD_WORKFLOW_ID" ]]
             then
               echo "Update existing CloudFront stack with the new id"
-              aws cloudformation update-stack  \
-                --stack-name udapeople-cloudfront \
-                --use-previous-template
-                --parameters ParameterKey=WorkflowID,ParameterValue=${PROD_WORKFLOW_ID}
+              aws cloudformation update-stack --stack-name udapeople-cloudfront --use-previous-template --parameters ParameterKey=WorkflowID,ParameterValue=${PROD_WORKFLOW_ID}
               # else              
               # echo "Create CloudFront stack"
               # aws cloudformation create-stack  \
@@ -562,10 +558,11 @@ jobs:
               aws cloudformation delete-stack --stack-name udapeople-backend-$DEV_WORKFLOW_ID
             fi
       # Here's where you will add some code to rollback on failure
-      - revert-migrations:
-          id: PROD_WORKFLOW_ID
-      - destroy-environment:
-          id: PROD_WORKFLOW_ID
+      # TODO: uncomment me at prod
+      # - revert-migrations:
+      #     id: PROD_WORKFLOW_ID
+      # - destroy-environment:
+      #     id: PROD_WORKFLOW_ID
 
 # cleanup:
 #     docker:
