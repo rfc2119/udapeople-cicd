@@ -1,3 +1,5 @@
+# Deploy as:
+# aws cloudformation 
 Description: >
   Deploys a single EC2 instance as Prometheus Server
 
@@ -51,5 +53,5 @@ Outputs:
   PublicDNS:
     Value: !Join ['', [ !GetAtt EC2Instance.PublicDnsName]]  
     Description: Public DNS for Prometheus server
-    # Export:
-    #   Name: PublicDNS
+    Export:
+      Name: PublicDNS
