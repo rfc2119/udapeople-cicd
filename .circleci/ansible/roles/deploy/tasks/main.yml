@@ -31,3 +31,8 @@
     cmd: pm2 start --name "api-backend" npm -- run start
     chdir: udapeople-cicd/backend
     # TODO: systemd and start as a service
+
+# TODO: because smoke-test sometimes fails
+- name: wait for application to start
+  pause:
+    seconds: 20
