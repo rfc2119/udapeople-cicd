@@ -599,12 +599,12 @@ workflows:
       - scan-frontend:
           requires: [build-frontend]
       - deploy-infrastructure:
-          # TODO: remove me in prod (the next line)
           requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+          # TODO: remove me in prod (the next line)
           # requires: [build-backend]
           filters:
             branches:
-              only: [cloudfront-update]
+              only: [main]
       - configure-infrastructure:
           requires: [deploy-infrastructure]
       - run-migrations:
