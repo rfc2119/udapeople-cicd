@@ -20,7 +20,7 @@ parameters:
   workflow-id:
     type: string
     # default: "cd0d8qrsenyt"   # for dev and testing. hint: RDS auto-generated ID
-    default: << pipeline.number >>    # prod workflow id
+    default: << pipeline.number >>    # prod workflow id. uncomment when going to prod
 
 commands:
   # TODO: needs improvment
@@ -88,10 +88,10 @@ commands:
           name: Destroy environments
           when: on_fail   # will this works ?
           command: |
+            aws s3 rm s3://udapeople-${<< parameters.id >>}/ --recursive
             aws cloudformation delete-stack --stack-name udapeople-frontend-${<< parameters.id >>}
             aws cloudformation delete-stack --stack-name udapeople-backend-${<< parameters.id >>}
-            aws cloudformation delete-stack --stack-name udapeople-cloudfront
-            aws s3 rm s3://udapeople-${<< parameters.id >>}/ --recursive
+            # aws cloudformation delete-stack --stack-name udapeople-cloudfront
 
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.
@@ -545,14 +545,15 @@ jobs:
               #   --template-body file://./.circleci/files/cloudfront.yml \
               #   --parameters ParameterKey=WorkflowID,ParameterValue=${CIRCLE_WORKFLOW_ID:0:7} \
               #   --tags 'Key=project,Value=udapeople'            
-              echo "Empty old S3 bucket and delete old frontend stack"
+              echo "Destroy old environment"
               aws s3 rm s3://udapeople-frontend-$DEV_WORKFLOW_ID/ --recursive
               aws cloudformation delete-stack --stack-name udapeople-frontend-$DEV_WORKFLOW_ID
-              echo "Delete old backend stack"
               aws cloudformation delete-stack --stack-name udapeople-backend-$DEV_WORKFLOW_ID
-
             fi
       # Here's where you will add some code to rollback on failure
+      - revert-migrations
+      - destroy-environment:
+          id: PROD_WORKFLOW_ID
 
 # cleanup:
 #     docker:
