@@ -1,2 +1,4 @@
 https://github.com/staticnotdynamic/udapeople-cicd
-http://udapeople-cd0d8qrsenyt.s3-website.ap-northeast-2.amazonaws.com
+http://udapeople-8add28dd.s3-website.ap-northeast-2.amazonaws.com/
+http://dvbavos5xytmp.cloudfront.net/
+http://3.35.229.154:3030

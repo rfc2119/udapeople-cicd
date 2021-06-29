@@ -515,20 +515,21 @@ jobs:
           command: |
             # TODO: region is hard-coded
             export FRONTEND_URL="http://udapeople-${ID}.s3-website.ap-northeast-2.amazonaws.com"
-            curl "${FRONTEND_URL}" | grep "Welcome"    # should return a non-zero rc if failed
+            curl -s "${FRONTEND_URL}" | grep "Welcome"    # should return a non-zero rc if failed
             if [ $? -ne 0 ]
             then
               exit 1
             fi
       - revert-migrations
       # TODO: uncomment me at prod
-      # - destroy-environment:
-      #     install_deps: true
+      - destroy-environment:
+          install_deps: true
 
   cloudfront-update:
     docker:
      - image: amazon/aws-cli:latest
     environment:
+      # same as env var ID. the name was changed for clarity
       PROD_WORKFLOW_ID: << pipeline.parameters.workflow-id >>
     steps:
       - checkout
@@ -553,16 +554,16 @@ jobs:
               #   --parameters ParameterKey=WorkflowID,ParameterValue=${CIRCLE_WORKFLOW_ID:0:7} \
               #   --tags 'Key=project,Value=udapeople'            
               echo "Destroy old environment"
-              aws s3 rm s3://udapeople-frontend-$DEV_WORKFLOW_ID/ --recursive
-              aws cloudformation delete-stack --stack-name udapeople-frontend-$DEV_WORKFLOW_ID
-              aws cloudformation delete-stack --stack-name udapeople-backend-$DEV_WORKFLOW_ID
+              aws s3 rm s3://udapeople-frontend-${DEV_WORKFLOW_ID}/ --recursive
+              aws cloudformation delete-stack --stack-name udapeople-frontend-${DEV_WORKFLOW_ID}
+              aws cloudformation delete-stack --stack-name udapeople-backend-${DEV_WORKFLOW_ID}
             fi
       # Here's where you will add some code to rollback on failure
       # TODO: uncomment me at prod
-      # - revert-migrations:
-      #     id: PROD_WORKFLOW_ID
-      # - destroy-environment:
-      #     id: PROD_WORKFLOW_ID
+      - revert-migrations:
+          id: PROD_WORKFLOW_ID
+      - destroy-environment:
+          id: PROD_WORKFLOW_ID
 
 # cleanup:
 #     docker:
