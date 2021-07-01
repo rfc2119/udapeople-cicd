@@ -118,6 +118,8 @@ commands:
               cd ~/project/backend
               npm install
               npm run migrations:revert
+            else
+              echo "no migrations were done"
             fi
 
             
@@ -502,14 +504,21 @@ jobs:
             # TODO: inventory.txt will not contain only the backend ip (extract the ip)
             export BACKEND_IP=$(cat inventory.txt)
             export API_URL="http://${BACKEND_IP}:3030"
-            curl -s "$API_URL/api/status"   # TODO: update this
+            curl -s "$API_URL/api/status" | grep "ok"  # TODO: update this
+            if [ $? -ne 0 ]
+            then
+              exit 1
+            fi
       - run:
           name: Frontend smoke test.
           command: |
             # TODO: region is hard-coded
             export FRONTEND_URL="http://udapeople-${ID}.s3-website.ap-northeast-2.amazonaws.com"
-            curl -s ${FRONTEND_URL} | grep "Welcome"    # should return a non-zero rc if failed
-      # Here's where you will add some code to rollback on failure
+            curl "${FRONTEND_URL}" | grep "Welcome"    # should return a non-zero rc if failed
+            if [ $? -ne 0 ]
+            then
+              exit 1
+            fi
       - revert-migrations
       - destroy-environment:
           install_deps: true
