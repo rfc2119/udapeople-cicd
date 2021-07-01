@@ -299,8 +299,6 @@ jobs:
       ID: << pipeline.parameters.workflow-id >>
     steps:
       - checkout
-      - restore_cache:
-          keys: [frontend-build]
       - run:
           name: Install docker image dependencies (and attach_workspace)
           command: |
@@ -310,6 +308,8 @@ jobs:
             # cd frontend
             # npm install webpack # install webpack
             # npm run build
+      - restore_cache:
+          keys: [frontend-build]
       - attach_workspace:
           at: ~/
       - run:
@@ -349,13 +349,15 @@ jobs:
           at: ~/
       - restore_cache:
           keys:
-            - backend-build
             - v2-pip-cache
       - run:
           name: Install ansible and rsync
           command: |
             pip install ansible
             sudo apt update && sudo apt install -y rsync
+      - restore_cache:
+          keys:
+            - backend-build
       - run:
           name: Install node and build backend (refactor me)
           command: |
@@ -369,8 +371,8 @@ jobs:
           name: Deploy backend
           working_directory: .circleci/ansible/
           command: |
-            # echo "inventory: $(cat inventory.txt)"
-            # echo "ansible cfg: $(cat ansible.cfg)"
+            echo "inventory: $(cat inventory.txt)"
+            echo "ansible cfg: $(cat ansible.cfg)"
             ls -la ../../backend/
             # cat ~/.ssh/*
             ansible-playbook deploy-backend.yml -i inventory.txt -vv
