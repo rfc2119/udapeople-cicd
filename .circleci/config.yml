@@ -3,6 +3,7 @@ version: 2.1
 # TODO: repeated installation of typescript and webpack
 # NOTE: when ssh'ing into a circleci container, DO NOT specify ssh user
 # NOTE: commands run in containers are run by a priviliged user
+# NOTE: add_ssh_keys copies the private key(s) from your circleci account
 # on the command line. ssh -p 64535 -i <keyfile> 34.224.101.194
 #
 # pipeline variables

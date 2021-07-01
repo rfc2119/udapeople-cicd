@@ -2,8 +2,8 @@
 
 - name: Copy backend built files to backend server
   synchronize:
-    src: project/backend/dist
-    dest: udapeople-cicd/backend/
+    src: /root/project/backend/dist
+    dest: udapeople-cicd/backend/   # TODO: hard-coded
     recursive: yes
     archive: yes
 
