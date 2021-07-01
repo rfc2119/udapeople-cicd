@@ -358,6 +358,7 @@ jobs:
             sudo apt update && sudo apt install -y rsync
       - run:
           name: Install node and build backend (refactor me)
+          command: |
             curl -O https://deb.nodesource.com/setup_14.x   # saves output as setup_14.x
             sudo bash setup_14.x
             sudo apt install -y nodejs
