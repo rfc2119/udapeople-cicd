@@ -15,14 +15,16 @@
   become: true
   command: bash -x setup_14.x
 
-- name: install nodejs with apt
+- name: install nodejs and rsync with apt
   become: true
   apt:
-    name: nodejs
+    pkg:
+      - nodejs
+      - rsync
 
 - name: install pm2
   become: true
-  community.general.npm:
+  npm:
     name: pm2
     global: true
 
