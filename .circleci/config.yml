@@ -1,5 +1,11 @@
 version: 2.1
 
+# pipeline variables
+parameters:
+  workflow-id:
+    type: string
+    default: "cd0d8qrsenyt"
+
 commands:
   destroy-environment:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
@@ -138,10 +144,13 @@ jobs:
           key: scan-backend
 
   # workflow id: cd0d8qrsenyt
+  # see https://circleci.com/docs/2.0/env-vars
+  # TODO: re-use env var ID
   deploy-infrastructure:
     docker:
-      # Docker image here that supports AWS CLI
       - image: amazon/aws-cli:latest
+    environment:
+      ID: << pipeline.parameters.workflow-id >>
     steps:
       - checkout
       - run:
@@ -149,26 +158,31 @@ jobs:
           command: |
             aws cloudformation deploy \
               --template-file .circleci/files/backend.yml \
-              --tags project=backend-cd0d8qrsenyt \
-              --stack-name "udapeople-backend-cd0d8qrsenyt" \
-              --parameter-overrides ID="cd0d8qrsenyt"  
+              --tags project="backend-$ID" \
+              --stack-name "udapeople-backend-$ID" \
+              --parameter-overrides ID=$ID
       - run:
           name: Ensure front-end infrastructure exist
           command: |
             aws cloudformation deploy \
               --template-file .circleci/files/frontend.yml \
-              --tags project=frontend-cd0d8qrsenyt \
-              --stack-name "udapeople-frontend-cd0d8qrsenyt" \
-              --parameter-overrides ID="cd0d8qrsenyt"  
-              #       - run:
-              #           name: Add back-end ip to ansible inventory
-              #           command: |
-              #             # Your code here
-              #             exit 1
-              #       - persist_to_workspace:
-              #           root: ~/
-              #           paths:
-              #             - project/.circleci/ansible/inventory.txt
+              --tags project=frontend-$ID \
+              --stack-name udapeople-frontend-$ID \
+              --parameter-overrides ID=$ID
+      - run:
+          name: Add back-end ip to ansible inventory
+          command: |
+            echo "cwd: $CIRCLE_WORKING_DIRECTORY"
+            aws ec2 describe-instances \
+              --filters Name="tag:Name,Values=backend-$ID" \
+              --query 'Reservations[*].Instances[*].PublicIpAddress' \
+              --output text | tee -a $CIRCLE_WORKING_DIRECTORY/.circleci/ansible/inventory.txt
+            # $CIRCLE_WORKING_DIRECTORY defaults to "project"
+            # see https://circleci.com/docs/2.0/configuration-reference/#jobs
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/.circleci/ansible/inventory.txt
       # Here's where you will add some code to rollback on failure      
 
 #   configure-infrastructure:
