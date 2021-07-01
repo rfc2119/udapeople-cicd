@@ -216,11 +216,16 @@ jobs:
             ls -l ~/.ssh/
             echo $PWD
             cat ~/.ssh/config
+      - restore_cache:
+          keys: [pip-cache]
       # TODO: use save/restore cache
       - run:
           name: Install dependencies
           command: |
             pip install ansible
+      - save_cache:
+          paths: [.cache/pip]
+          key: pip-cache
       - run:
           name: Configure server
           working_directory: .circleci/ansible
