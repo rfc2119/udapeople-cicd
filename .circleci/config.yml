@@ -314,6 +314,8 @@ jobs:
           keys: [frontend-build]
       - attach_workspace:
           at: ~/
+      - restore_cache:
+          keys: [frontend-build]
       - run:
           name: Get backend url and bake it into the frontend code
           command: |
