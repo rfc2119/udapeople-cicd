@@ -21,31 +21,28 @@ parameters:
     default: "cd0d8qrsenyt"   # Hint: RDS auto-generated ID
 
 commands:
+  # TODO: needs improvment
   install-awscli-cmd:
-    description: Installs AWS CLI (TODO needs improvment)
-    parameters:
-      pkg-manager:
-        type: string
-        default: "apt"
+    description: Installs AWS CLI
+    # parameters:
+    #   pkg-manager:
+    #     type: string
+    #     default: "apt"
     steps:
-      - run: echo "installing awscli with << parameters.pkg-manager >>"
       - run:
           name: Install AWS CLI through Python 3
           command: |
             # version=$(cat /proc/version)
             # if [[ "$version" =~ "deb" ]]; then
-            # if command -v "apk"; then
-            export pkgmgr="<< parameters.pkg-manager >>"
-            case ${pkgmgr,,} in
-              "apt")
-                apt install -y python3 python3-pip;;
-              "apk")
-                apk add python3 python3-pip;;
-              "yum")
-                yum install -y python3 python3-pip;;
-              *)
-                echo "package manager not supported ?";;
-            esac
+            # export pkgmgr="<< parameters.pkg-manager >>"
+            if command -v "apt"; then
+              apt install -y python3 python3-pip
+            elif command -v "apk"; then
+              apk add python3 python3-pip
+            elif command -v "yum"; then
+              yum install -y python3 python3-pip
+            else
+              echo "package manager not supported ?"
             pip install awscli
 
   destroy-environment:
@@ -59,9 +56,10 @@ commands:
         default: false
     steps:
       - when:
-          condition: install_deps
-          steps:
-            - install-awscli-cmd
+          condition:
+            and:
+              - << parameters.install_deps >>
+              - on_fail
       - run:
           name: Destroy environments
           when: on_fail
@@ -83,7 +81,10 @@ commands:
         default: false
     steps:
       - when:
-          condition: install_deps
+          condition:
+            and:
+              - << parameters.install_deps >>
+              - on_fail
           steps:
             - install-awscli-cmd
       - run:
@@ -258,7 +259,7 @@ jobs:
             - project/.circleci/ansible/inventory.txt
             - project/.circleci/ansible/ansible.cfg
       # Here's where you will add some code to rollback on failure      
-      - destroy-environment
+      destroy-environment
 
   configure-infrastructure:
     docker:
