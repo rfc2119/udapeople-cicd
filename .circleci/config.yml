@@ -233,6 +233,7 @@ jobs:
       # TODO: why the duck does ansible not use host_key_checking except from ansible.cfg ?
       - run:
           name: Configure server
+          no_output_timeout: 30m
           working_directory: .circleci/ansible
           command: |
             cp /tmp/project/.circleci/ansible/inventory.txt ./  # TODO: redundant ?
