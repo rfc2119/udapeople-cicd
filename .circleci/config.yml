@@ -42,6 +42,7 @@ commands:
               yum install -y python3 python3-pip
             else
               echo "package manager not supported ?"
+            fi
             pip install awscli
 
   destroy-environment:
