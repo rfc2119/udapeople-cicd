@@ -190,11 +190,13 @@ jobs:
             # this works because we've only one host, but it fails to scale
             # $CIRCLE_WORKING_DIRECTORY defaults to "project"
             # see https://circleci.com/docs/2.0/configuration-reference/#jobs
+            echo -e '[defaults]\nhost_key_checking = false' | tee ansible.cfg
       # this step requires tar and gzip to be installed on the image
       - persist_to_workspace:
           root: ~/
           paths:
             - project/.circleci/ansible/inventory.txt
+            - project/.circleci/ansible/ansible.cfg
       # Here's where you will add some code to rollback on failure      
 
   configure-infrastructure:
@@ -237,7 +239,6 @@ jobs:
           working_directory: .circleci/ansible
           command: |
             cp /tmp/project/.circleci/ansible/inventory.txt ./  # TODO: redundant ?
-            echo -e '[defaults]\nhost_key_checking = false' | tee ansible.cfg
             # echo -e '[web:vars]\nhost_key_checking=false' | tee -a inventory.txt
             # export ANSIBLE_HOST_KEY_CHECKING=False
             ansible-playbook configure-server.yml  -i inventory.txt # -vvvv
@@ -332,7 +333,7 @@ jobs:
                     
   deploy-backend:
     docker:
-      - image: cimg/python:3.7
+      - image: cimg/python:3.8
       # Docker image here that supports Ansible
     steps:
       # Checkout code from git
@@ -345,7 +346,9 @@ jobs:
       - attach_workspace:
           at: ~/
       - restore_cache:
-          keys: [v2-pip-cache]
+          keys:
+            - v2-pip-cache
+            - backend-build
       - run:
           name: Install dependencies
           command: |
