@@ -407,7 +407,6 @@ jobs:
           command: |
             # TODO: region is hard-coded
             FRONTEND_URL="http://udapeople-${ID}.s3-website-ap-northeast-2.amazonaws.com"
-            echo $FRONTEND_URL
             curl -s ${FRONTEND_URL} | grep "Welcome"    # should return a non-zero rc if failed
       # Here's where you will add some code to rollback on failure
 
