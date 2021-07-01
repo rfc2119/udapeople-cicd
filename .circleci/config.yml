@@ -356,13 +356,14 @@ jobs:
           command: |
             pip install ansible
             sudo apt update && sudo apt install -y rsync
+      - build-backend
       - run:
           name: Deploy backend
           working_directory: .circleci/ansible/
           command: |
             # echo "inventory: $(cat inventory.txt)"
             # echo "ansible cfg: $(cat ansible.cfg)"
-            ls -la ~/.ssh/
+            ls -la ../backend/
             # cat ~/.ssh/*
             ansible-playbook deploy-backend.yml -i inventory.txt -vv
       # Here's where you will add some code to rollback on failure  
@@ -429,7 +430,7 @@ workflows:
   default:
     jobs:
       # - build-frontend
-      # - build-backend
+      - build-backend
       # - test-frontend:
       #     requires: [build-frontend]
       # - test-backend:
@@ -441,6 +442,7 @@ workflows:
       - deploy-infrastructure:
         # TODO: remove me in prod (the next line)
           # requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+          requires: [build-backend]
           filters:
             branches:
               only: [deploy-to-prod-tmp]
