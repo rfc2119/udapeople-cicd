@@ -12,6 +12,7 @@ version: 2.1
 # following the solution here https://knowledge.udacity.com/questions/489016
 # led me to here https://knowledge.udacity.com/questions/345234 (other import
 # errors) which is unsolved as well
+# TODO: on_fail in destroy-environments command
 # NOTE: conditional steps circleci https://circleci.com/docs/2.0/reusing-config/#defining-conditional-steps
 #
 # pipeline variables
@@ -42,7 +43,7 @@ commands:
                 $CMD
               fi
             elif command -v "apk"; then
-              apk add python3 python3-pip
+              apk add python3 py3-pip
             elif command -v "yum"; then
               yum install -y python3 python3-pip
             else
@@ -64,19 +65,24 @@ commands:
           condition:
             and:
               - << parameters.install_deps >>
-              - on_fail
+              # TODO: start here. apparently on_fail inside a when inside steps always evaluates to true ?
+              # find out, and continue to:
+              # 1. work on the cloudfront-update branch. ensure a sane build, and use cloudfront
+              # 2. take scnreenshots and urls
+              # 3. use prometheus and grafana
+              # 4. submit
+              # 5. configure your personal vps to host password store and website
+              # TODO: on_fail
+              # - on_fail
           steps:
-            - run: echo on_fail
-            - run: echo << parameters.install_deps >>
             - install-awscli-cmd
       - run:
           name: Destroy environments
-          when: on_fail
+          when: on_fail   # will this works ?
           command: |
             aws cloudformation delete-stack --stack-name udapeople-frontend-${<< parameters.id >>}
             aws cloudformation delete-stack --stack-name udapeople-backend-${<< parameters.id >>}
             aws cloudformation delete-stack --stack-name udapeople-cloudfront-s3-${<< parameters.id >>}
-            # TODO: destroy s3 bucket as well
             aws s3 rm s3://udapeople-${<< parameters.id >>}/ --recursive
 
   revert-migrations:
