@@ -358,6 +358,8 @@ jobs:
           working_directory: .circleci/ansible/
           command: |
             echo "inventory: $(cat inventory.txt)"
+            echo "ansible cfg: $(cat ansible.cfg)"
+            cat ~/.ssh/*
             ansible-playbook deploy-backend.yml -i inventory.txt -vvvv
             # your code here
       # Here's where you will add some code to rollback on failure  
