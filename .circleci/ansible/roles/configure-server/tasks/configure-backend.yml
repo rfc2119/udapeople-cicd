@@ -19,12 +19,12 @@
 - name: checking if repo folder exists
   stat:
     path: git/udapeople-cicd
-  register: repo-folder
+  register: repo_folder
 - name: remove repo folder if exists
   file:
     path: git/udapeople-cicd
     state: absent
-  when: repo-folder.stat.exists # and repo-folder.stat.isdir
+  when: repo_folder.stat.exists # and repo-folder.stat.isdir
 - name: cloning the repository
   shell:
     cmd: 'rm -rf udapeople-cicd || git clone https://github.com/staticnotdynamic/udapeople-cicd'
