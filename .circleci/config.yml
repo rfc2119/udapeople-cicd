@@ -534,7 +534,7 @@ workflows:
           # requires: [build-backend]
           filters:
             branches:
-              only: [smoke-test]
+              only: [cloudfront-update]
       # - configure-infrastructure:
       #     requires: [deploy-infrastructure]
       - run-migrations:
