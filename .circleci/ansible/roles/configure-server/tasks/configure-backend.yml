@@ -6,6 +6,7 @@
   become: true
   command: bash setup_14.x
 - name: install with apt
+  become: true
   apt:
     name: nodejs
         # - name: install pm2
