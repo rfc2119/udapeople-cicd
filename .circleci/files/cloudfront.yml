@@ -20,6 +20,7 @@ Resources:
     Properties:
       DistributionConfig:
         Origins:
+          # bucket was created in files/frontend.yml
           - DomainName: !Sub "udapeople-${WorkflowID}.s3.amazonaws.com"
             Id: webpage
             S3OriginConfig:
