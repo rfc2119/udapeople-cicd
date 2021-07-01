@@ -1,6 +1,9 @@
 version: 2.1
 
 # TODO: repeated installation of typescript and webpack
+# NOTE: when ssh'ing into a circleci container, DO NOT specify ssh user
+# on the command line. ssh -p 64535 -i <keyfile> 34.224.101.194
+#
 # pipeline variables
 parameters:
   workflow-id:
@@ -230,7 +233,7 @@ jobs:
           name: Configure server
           working_directory: .circleci/ansible
           command: |
-            cp /tmp/project/.circleci/ansible/inventory.txt ./
+            cp /tmp/project/.circleci/ansible/inventory.txt ./  # TODO: redundant ?
             echo -e '[defaults]\nhost_key_checking = false' | tee ansible.cfg
             # echo -e '[web:vars]\nhost_key_checking=false' | tee -a inventory.txt
             # export ANSIBLE_HOST_KEY_CHECKING=False
@@ -255,23 +258,15 @@ jobs:
           no_output_timeout: 15m
           command: |
             cd backend    # migrations script are found at the backend
-            # ========== halp
-            echo "TYPEORM_CONNECTION=$TYPEORM_CONNECTION" | tee .env
-            echo "TYPEORM_MIGRATIONS_DIR=$TYPEORM_MIGRATIONS_DIR" | tee -a .env
-            echo "TYPEORM_ENTITIES=$TYPEORM_ENTITIES" | tee -a .env
-            echo "TYPEORM_MIGRATIONS=$TYPEORM_MIGRATIONS" | tee -a .env
-            echo "TYPEORM_HOST=$TYPEORM_HOST" | tee -a .env
-            echo "TYPEORM_PORT=$TYPEORM_PORT" | tee -a .env
-            echo "TYPEORM_USERNAME=$TYPEORM_USERNAME" | tee -a .env
-            echo "TYPEORM_PASSWORD=$TYPEORM_PASSWORD" | tee -a .env
-            echo "TYPEORM_DATABASE=$TYPEORM_DATABASE" | tee -a .env
-            # ========= end halp
-            npm run migrations > migrations.out
+            npm run migrations | tee migrations.out
+
+      - run:
+          name: Send migration results to memstash
+          command: |
             grep "has been executed successfully" migrations.out
             if [[ $(echo $?) != 0 ]];
             then
               echo "migrations ran successfully! notifying memstash"
-              # TODO: start here! what is memstash.io ? how to specify the key ?
               curl -H "Content-Type: text/plain" \
                     -H "token: 488b0450-32fc-4365-8f61-e9600d091338" \
                     --request PUT --data "0" \
@@ -279,12 +274,7 @@ jobs:
               else
                 echo "no migrations have been done"
             fi
-              
-            # - run:
-            #     name: Send migration results to memstash
-            #     command: |
-            #       # Your code here
-            #       exit 1
+
       - run:
           name: LogOnFail
           when: on_fail
@@ -304,14 +294,18 @@ jobs:
       ID: << pipeline.parameters.workflow-id >>
     steps:
       - checkout
+      - attach_workspace:
+          at: ~/
       - restore_cache:
           keys: [frontend-build]
-      # - run:
-      #     name: Install dependencies
-      #     command: |
-      #       cd frontend
-      #       npm install webpack # install webpack
-      #       npm run build
+      - run:
+          name: Install docker image dependencies
+          command: |
+            curl -O https://rpm.nodesource.com/setup_14.x   # saves output as setup_14.x
+            sudo bash setup_14.x
+            # cd frontend
+            # npm install webpack # install webpack
+            # npm run build
       - run:
           name: Get backend url
           command: |
