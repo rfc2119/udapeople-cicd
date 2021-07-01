@@ -193,6 +193,7 @@ jobs:
             # $CIRCLE_WORKING_DIRECTORY defaults to "project"
             # see https://circleci.com/docs/2.0/configuration-reference/#jobs
             echo -e '[defaults]\nhost_key_checking = false' | tee ansible.cfg
+
       # this step requires tar and gzip to be installed on the image
       - persist_to_workspace:
           root: ~/
@@ -224,7 +225,7 @@ jobs:
       # The workspace can be used to pass along unique data built during a job
       # to other jobs in the same workflow
       - attach_workspace:
-          at: /tmp/
+          at: ~/              # TODO: redundant ?
       - restore_cache:
           keys: [v2-pip-cache]
       - run:
@@ -240,7 +241,8 @@ jobs:
           no_output_timeout: 30m
           working_directory: .circleci/ansible
           command: |
-            cp /tmp/project/.circleci/ansible/inventory.txt ./  # TODO: redundant ?
+            # cp /tmp/project/.circleci/ansible/inventory.txt ./  # TODO: redundant ?
+            echo -e '[defaults]\nhost_key_checking = false' | tee ansible.cfg
             # echo -e '[web:vars]\nhost_key_checking=false' | tee -a inventory.txt
             # export ANSIBLE_HOST_KEY_CHECKING=False
             ansible-playbook configure-server.yml  -i inventory.txt # -vvvv
@@ -348,8 +350,7 @@ jobs:
       - attach_workspace:
           at: ~/
       - restore_cache:
-          keys:
-            - v2-pip-cache
+          keys: [v2-pip-cache, backend-build]
       - run:
           name: Install ansible and rsync
           command: |
@@ -371,11 +372,8 @@ jobs:
           name: Deploy backend
           working_directory: .circleci/ansible/
           command: |
-            echo "inventory: $(cat inventory.txt)"
-            echo "ansible cfg: $(cat ansible.cfg)"
-            ls -la ../../backend/
-            # cat ~/.ssh/*
-            ansible-playbook deploy-backend.yml -i inventory.txt -vv
+            # your code here
+            ansible-playbook deploy-backend.yml -i inventory.txt -vvvv
       # Here's where you will add some code to rollback on failure  
 
 #   smoke-test:

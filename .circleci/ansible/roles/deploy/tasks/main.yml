@@ -1,26 +1,9 @@
 ---
 
-- name: print cwd
-  debug:
-    msg:
-      - " cwd: {{ lookup('env', 'PWD') }} "
-
-# TODO
-# - name: record whoami
-#   command: whoami
-#   register: os_user
-
-
 - name: Copy backend built files to backend server
   synchronize:
-    # TODO: hard-coded values
-    src: '/home/circleci/project/backend/dist'  # TODO: because ansible was run inside the project dir
+    src: project/backend/dist
     dest: udapeople-cicd/backend/
     recursive: yes
     archive: yes
 
-- name: start production server
-  shell:
-    chdir: udapeople-cicd/backend
-    cmd: pm2 start --name "api-backend" npm -- run start:prod
-    # TODO: systemd and start as a service

@@ -1,6 +1,6 @@
 ---
 
-- name: "Deploy built files to backend" 
+- name: "Copy build files to backend server" 
   hosts: all
   user: ubuntu
   gather_facts: false
