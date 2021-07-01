@@ -2,9 +2,9 @@ version: 2.1
 
 # TODO: repeated installation of typescript and webpack
 # NOTE: when ssh'ing into a circleci container, DO NOT specify ssh user
-# NOTE: commands run in containers are run by a priviliged user
-# NOTE: add_ssh_keys copies the private key(s) from your circleci account
 # on the command line. ssh -p 64535 -i <keyfile> 34.224.101.194
+# NOTE: commands run in containers are run by a priviliged user (not all images)
+# NOTE: add_ssh_keys copies the private key(s) from your circleci account
 #
 # pipeline variables
 parameters:
@@ -356,16 +356,29 @@ jobs:
           command: |
             pip install ansible
             sudo apt update && sudo apt install -y rsync
-      - restore_cache:
-          keys:
-            - backend-build
       - run:
           name: Install node and build backend (refactor me)
           command: |
             curl -O https://deb.nodesource.com/setup_14.x   # saves output as setup_14.x
             sudo bash setup_14.x
             sudo apt install -y nodejs
+      - restore_cache:
+          keys:
+            - backend-build
+      - run:
+          name: build backend with correct env vars
+          command: |
             cd backend
+            echo "NODE_ENV=production" > .env
+            echo "TYPEORM_CONNECTION=$TYPEORM_CONNECTION" >> .env
+            echo "TYPEORM_MIGRATIONS_DIR=$TYPEORM_MIGRATIONS_DIR" >> .env
+            echo "TYPEORM_ENTITIES=$TYPEORM_ENTITIES" >> .env
+            echo "TYPEORM_MIGRATIONS=$TYPEORM_MIGRATIONS" >> .env
+            echo "TYPEORM_HOST=$TYPEORM_HOST" >> .env
+            echo "TYPEORM_PORT=$TYPEORM_PORT" >> .env
+            echo "TYPEORM_USERNAME=$TYPEORM_USERNAME" >> .env
+            echo "TYPEORM_PASSWORD=$TYPEORM_PASSWORD" >> .env
+            echo "TYPEORM_DATABASE=$TYPEORM_DATABASE" >> .env
             npm install typescript  # install typescript (no need to install ALL packages)
             npm run build
       - run:
