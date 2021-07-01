@@ -608,18 +608,18 @@ workflows:
               only: [prometheus]
       - configure-infrastructure:
           requires: [deploy-infrastructure]
-      # - run-migrations:
-      #     requires: [configure-infrastructure]
-      #     # requires: [deploy-infrastructure]   # TODO: this is not the correct 'require'. use ^ instead
-      # - deploy-frontend:
-      #     requires: [run-migrations]
-      #     # requires: [deploy-infrastructure]   # TODO: this is not the correct 'require'. use ^ instead
-      # - deploy-backend:
-      #     requires: [run-migrations]
-      #     # requires: [deploy-infrastructure]   # TODO: this is not the correct 'require'. use ^ instead
-      # - smoke-test:
-      #     requires: [deploy-backend, deploy-frontend]
-      # - cloudfront-update:
-      #     requires: [smoke-test]
+      - run-migrations:
+          requires: [configure-infrastructure]
+          # requires: [deploy-infrastructure]   # TODO: this is not the correct 'require'. use ^ instead
+      - deploy-frontend:
+          requires: [run-migrations]
+          # requires: [deploy-infrastructure]   # TODO: this is not the correct 'require'. use ^ instead
+      - deploy-backend:
+          requires: [run-migrations]
+          # requires: [deploy-infrastructure]   # TODO: this is not the correct 'require'. use ^ instead
+      - smoke-test:
+          requires: [deploy-backend, deploy-frontend]
+      - cloudfront-update:
+          requires: [smoke-test]
       # - cleanup:
       #     requires: [cloudfront-update]
