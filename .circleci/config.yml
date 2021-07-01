@@ -206,7 +206,7 @@ jobs:
       # The workspace can be used to pass along unique data built during a job
       # to other jobs in the same workflow
       - attach_workspace:
-          at: .circleci/ansible/
+          at: /tmp/
       - run:
           name: Debugging
           command: |
@@ -214,11 +214,12 @@ jobs:
             cat ~/.ssh/*
             ls -l .circleci/ansible/
             cat .circleci/ansible/inventory.txt
+            ls -l /tmp/project
       - run:
           name: Install dependencies
           command: |
             # Install ansible
-            sudo apt update
+            # sudo apt update
             # sudo apt install -y python3 python3-pip
             pip install ansible
       - run:
