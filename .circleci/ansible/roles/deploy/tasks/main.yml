@@ -5,10 +5,14 @@
     msg:
       - " cwd: {{ lookup('env', 'PWD') }} "
 
+# TODO
+- name: record whoami
+  command: whoami
+  register: os_user
+
 - name: Copy backend built files to backend server
-  become: true    # TODO: why ?
   synchronize:
-    src: backend/dist
+    src: '/home/{{ os_user.stdout }}/project/backend/dist'  # TODO: because ansible was run inside the project dir
     dest: udapeople-cicd/backend/   # TODO: hard-coded
     recursive: yes
     archive: yes

@@ -358,13 +358,13 @@ jobs:
             sudo apt update && sudo apt install -y rsync
       - run:
           name: Deploy backend
-          # working_directory: .circleci/ansible/
+          working_directory: .circleci/ansible/
           command: |
             # echo "inventory: $(cat inventory.txt)"
             # echo "ansible cfg: $(cat ansible.cfg)"
             ls -la ~/.ssh/
             # cat ~/.ssh/*
-            ansible-playbook .circleci/ansible/deploy-backend.yml -i .circleci/ansible/inventory.txt -vv
+            ansible-playbook deploy-backend.yml -i inventory.txt -vv
       # Here's where you will add some code to rollback on failure  
 
 #   smoke-test:
