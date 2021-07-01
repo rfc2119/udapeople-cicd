@@ -62,27 +62,26 @@ commands:
         type: boolean
         default: false
     steps:
-      # - run:
-      #   name: print statement
-      #   when: on_fail
-      #   command: echo << parameters.install_deps >> from top-level steps
-      - install-awscli-cmd
-      # - when:
-      #     condition:
-      #       and:
-      #         - <<parameters.install_deps>>
-      #         # TODO: start here. apparently on_fail inside a when inside steps always evaluates to true ?
-      #         # find out, and continue to:
-      #         # 1. work on the cloudfront-update branch. ensure a sane build, and use cloudfront
-      #         # 2. take scnreenshots and urls
-      #         # 3. use prometheus and grafana
-      #         # 4. submit
-      #         # 5. configure your personal vps to host password store and website
-      #         # TODO: on_fail in logical statement (type Logical) is not the same as on_fail elsewhere
-      #         - on_fail
-      #     steps:
-      #       - run: echo << parameters.install_deps >> from 'when' step
-      #       - install-awscli-cmd
+      - run:
+          name: print statement
+          when: on_fail
+          command: echo << parameters.install_deps >> from top-level steps
+      - when:
+          condition:
+            and:
+              - << parameters.install_deps >>
+              # TODO: start here. apparently on_fail inside a when inside steps always evaluates to true ?
+              # find out, and continue to:
+              # 1. work on the cloudfront-update branch. ensure a sane build, and use cloudfront
+              # 2. take scnreenshots and urls
+              # 3. use prometheus and grafana
+              # 4. submit
+              # 5. configure your personal vps to host password store and website
+              # TODO: on_fail
+              - on_fail
+          steps:
+            - run: echo << parameters.install_deps >> from 'when' step
+            - install-awscli-cmd
       - run:
           name: Destroy environments
           when: on_fail   # will this works ?
