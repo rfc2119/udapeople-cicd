@@ -61,6 +61,7 @@ commands:
         type: boolean
         default: false
     steps:
+      - run: echo << parameters.install_deps >>
       - when:
           condition:
             and:
@@ -96,13 +97,6 @@ commands:
         type: boolean
         default: false
     steps:
-      - run:
-          name: Update bash
-          when: on_fail
-          command: |
-            if command -v "apk"; then
-              apk add --upgrade bash
-            fi
       - run:
           name: Revert migrations
           when: on_fail
