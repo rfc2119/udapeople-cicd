@@ -300,7 +300,7 @@ jobs:
           command: |
             yum install -y tar gzip
             curl -O https://rpm.nodesource.com/setup_14.x   # saves output as setup_14.x
-            sudo bash setup_14.x
+            bash setup_14.x
             # cd frontend
             # npm install webpack # install webpack
             # npm run build
