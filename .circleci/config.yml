@@ -34,7 +34,6 @@ commands:
           command: |
             # version=$(cat /proc/version)
             # if [[ "$version" =~ "deb" ]]; then
-            # export pkgmgr="<< parameters.pkg-manager >>"
             if command -v "apt"; then
               apt install -y python3 python3-pip
             elif command -v "apk"; then
@@ -60,6 +59,8 @@ commands:
             and:
               - << parameters.install_deps >>
               - on_fail
+          steps:
+            - install-awscli-cmd
       - run:
           name: Destroy environments
           when: on_fail
@@ -259,7 +260,7 @@ jobs:
             - project/.circleci/ansible/inventory.txt
             - project/.circleci/ansible/ansible.cfg
       # Here's where you will add some code to rollback on failure      
-      destroy-environment
+      - destroy-environment
 
   configure-infrastructure:
     docker:
