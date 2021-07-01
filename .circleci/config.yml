@@ -500,10 +500,10 @@ jobs:
           name: Backend smoke test.
           working_directory: .circleci/ansible
           command: |
-            echo "backend ip from ansible: $(cat inventory.txt)"
             # TODO: inventory.txt will not contain only the backend ip (extract the ip)
             export BACKEND_IP=$(cat inventory.txt)
             export API_URL="http://${BACKEND_IP}:3030"
+            echo "API URL: $API_URL"
             curl -s "$API_URL/api/status" | grep "ok"  # TODO: update this
             if [ $? -ne 0 ]
             then
@@ -520,8 +520,8 @@ jobs:
               exit 1
             fi
       - revert-migrations
-      - destroy-environment:
-          install_deps: true
+        # - destroy-environment:
+        #     install_deps: true
 
   cloudfront-update:
     docker:
