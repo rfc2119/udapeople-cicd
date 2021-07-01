@@ -1,8 +1,5 @@
 ---
 
-- name: starting debug messages
-  debug:
-    msg: starting role "deploy"
 - name: Copy backend built files to backend server
   synchronize:
     src: project/backend/dist
