@@ -481,15 +481,15 @@ workflows:
               only: [smoke-test]
       # - configure-infrastructure:
       #     requires: [deploy-infrastructure]
-      # - run-migrations:
-      #     # requires: [configure-infrastructure]
-      #     requires: [deploy-infrastructure]   # TODO: this is not the correct 'require'. use ^ instead
+      - run-migrations:
+          # requires: [configure-infrastructure]
+          requires: [deploy-infrastructure]   # TODO: this is not the correct 'require'. use ^ instead
       - deploy-frontend:
-          # requires: [run-migrations]
-          requires: [deploy-infrastructure]   # TODO: this is not the correct 'require'. use ^ instead
+          requires: [run-migrations]
+          # requires: [deploy-infrastructure]   # TODO: this is not the correct 'require'. use ^ instead
       - deploy-backend:
-          # requires: [run-migrations]
-          requires: [deploy-infrastructure]   # TODO: this is not the correct 'require'. use ^ instead
+          requires: [run-migrations]
+          # requires: [deploy-infrastructure]   # TODO: this is not the correct 'require'. use ^ instead
       - smoke-test:
           requires: [deploy-backend, deploy-frontend]
       # - cloudfront-update:
