@@ -20,10 +20,14 @@
   git:
     repo: 'https://github.com/staticnotdynamic/udapeople-cicd'
     dest: git/udapeople-cicd
+- name: install nodejs dependencies for backend
+  command:
+    chdir: git/udapeople-cicd/backend
+    cmd: npm i
 - name: build backend
   command:
     chdir: git/udapeople-cicd/backend
-    cmd: 'npm i && npm run build'
+    cmd: npm run build
 - name: start production server
   command:
     chdir: git/udapeople-cicd/backend
