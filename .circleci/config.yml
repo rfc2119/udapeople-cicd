@@ -418,7 +418,11 @@ jobs:
             # TODO: inventory.txt will not contain only the backend ip (extract the ip)
             export BACKEND_IP=$(cat inventory.txt)
             export API_URL="http://${BACKEND_IP}:3030"
+            echo "URL is: $API_URL"
             curl -s "$API_URL/api/status"
+            echo "job would fail if above command returned a non-zero exit code"
+            curl -s "$API_URL/does/not/exist"
+            echo "impossible to reach here
       - run:
           name: Frontend smoke test.
           command: |
@@ -482,7 +486,7 @@ workflows:
           # requires: [build-backend]
           filters:
             branches:
-              only: [smoke-test]
+              only: [cloudfront-update]
       # - configure-infrastructure:
       #     requires: [deploy-infrastructure]
       - run-migrations:
