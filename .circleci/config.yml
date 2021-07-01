@@ -62,9 +62,9 @@ commands:
         default: false
     steps:
       - when:
-          condition:
-            and:
-              - << parameters.install_deps >>
+          condition: << parameters.install_deps >>
+            # and:
+              # - << parameters.install_deps >>
               # TODO: start here. apparently on_fail inside a when inside steps always evaluates to true ?
               # find out, and continue to:
               # 1. work on the cloudfront-update branch. ensure a sane build, and use cloudfront
@@ -74,8 +74,7 @@ commands:
               # 5. configure your personal vps to host password store and website
               # TODO: on_fail
               # - on_fail
-          steps:
-            - install-awscli-cmd
+          steps: install-awscli-cmd
       - run:
           name: Destroy environments
           when: on_fail   # will this works ?
@@ -95,15 +94,13 @@ commands:
         type: boolean
         default: false
     steps:
-      - when:
-          condition:
-            and:
-              - << parameters.install_deps >>
-              - on_fail
-          steps:
-            - run: echo on_fail
-            - run: echo << parameters.install_deps >>
-            - install-awscli-cmd
+      - run:
+          name: Update bash
+          when: on_fail
+          command: |
+            if [ command -v "apk" ]; then
+              apk add --upgrade bash
+            fi
       - run:
           name: Revert migrations
           when: on_fail
