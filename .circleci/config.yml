@@ -498,6 +498,9 @@ jobs:
             export BACKEND_IP=$(cat inventory.txt)
             export API_URL="http://${BACKEND_IP}:3030"
             curl -s "$API_URL/api/status"
+            if curl -s "$API_URL/does/not/exist" | grep -q "error"; then  # TODO: sloppy test
+              exit 1
+            fi
       - run:
           name: Frontend smoke test.
           command: |
