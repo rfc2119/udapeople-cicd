@@ -504,7 +504,7 @@ jobs:
             export BACKEND_IP=$(cat inventory.txt)
             export API_URL="http://${BACKEND_IP}:3030"
             echo "API URL: $API_URL"
-            curl -s "$API_URL/api/status" | grep "ok"  # TODO: update this
+            curl -s "${API_URL}/api/status" | grep "ok"  # TODO: update this
             if [ $? -ne 0 ]
             then
               exit 1
