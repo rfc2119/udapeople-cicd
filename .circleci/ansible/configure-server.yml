@@ -1,7 +1,8 @@
 ---
 # configuring an ubuntu server
 - name: "configuration play." 
-  hosts: web
+  # hosts: web
+  hosts: all    # TODO: group hosts. see the TODO about scaling to several hosts in circleci config
   user: ubuntu
   gather_facts: false
   vars:
