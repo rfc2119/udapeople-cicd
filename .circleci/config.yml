@@ -267,7 +267,6 @@ jobs:
           command: |
             cd backend    # migrations script are found at the backend
             npm run migrations | tee migrations.out
-
       - run:
           name: Send migration results to memstash
           command: |
@@ -281,7 +280,6 @@ jobs:
               else
                 echo "no migrations have been done"
             fi
-
       - run:
           name: LogOnFail
           when: on_fail
@@ -380,7 +378,6 @@ jobs:
 
   smoke-test:
     docker:
-      # Lightweight Docker image
       - image: alpine:latest
     environment:
       ID: << pipeline.parameters.workflow-id >>
@@ -389,14 +386,18 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apk add --no-cache curl tar
+            apk add --no-cache gzip tar curl
       - attach_workspace:
-          at: /              # TODO: redundant ?
+          at: ~/
       - run:
           name: Get backend url
+          working_directory: .circleci/ansible
           command: |
-            export BACKEND_IP=$(cat .circleci/ansible/inventory.txt)
+            echo "backend ip from ansible: $(cat inventory.txt)"
+            # TODO: inventory.txt will not contain only the backend ip (extract the ip)
+            export BACKEND_IP=$(cat inventory.txt)
             export API_URL="http://${BACKEND_IP}:3030"
+            echo "Backend API URL: ${API_URL}"
       - run:
           name: Backend smoke test.
           command: |
@@ -404,14 +405,9 @@ jobs:
       - run:
           name: Frontend smoke test.
           command: |
-            # TODO: region
-            export FRONTEND_URL="http://udapeople-${ID}.s3-website-ap-northeast-2.amazonaws.com"
-            if curl -s ${FRONTEND_URL} | grep "Welcome";
-            then
-              return 1
-            else
-              return 0
-            fi
+            # TODO: region is hard-coded
+            FRONTEND_URL="http://udapeople-${ID}.s3-website-ap-northeast-2.amazonaws.com"
+            curl -s ${FRONTEND_URL} | grep "Welcome"    # should return a non-zero rc if failed
       # Here's where you will add some code to rollback on failure
 
 #   cloudfront-update:
@@ -469,20 +465,20 @@ workflows:
           # requires: [build-backend]
           filters:
             branches:
-              only: [deploy-to-prod-tmp]
+              only: [smoke-test]
       # - configure-infrastructure:
       #     requires: [deploy-infrastructure]
       # - run-migrations:
       #     # requires: [configure-infrastructure]
       #     requires: [deploy-infrastructure]   # TODO: this is not the correct 'require'. use ^ instead
       - deploy-frontend:
-          requires: [run-migrations]
-          # requires: [deploy-infrastructure]   # TODO: this is not the correct 'require'. use ^ instead
+          # requires: [run-migrations]
+          requires: [deploy-infrastructure]   # TODO: this is not the correct 'require'. use ^ instead
       - deploy-backend:
-          requires: [run-migrations]
-          # requires: [deploy-infrastructure]   # TODO: this is not the correct 'require'. use ^ instead
-      # - smoke-test:
-      #     requires: [deploy-backend, deploy-frontend]
+          # requires: [run-migrations]
+          requires: [deploy-infrastructure]   # TODO: this is not the correct 'require'. use ^ instead
+      - smoke-test:
+          requires: [deploy-backend, deploy-frontend]
       # - cloudfront-update:
       #     requires: [smoke-test]
       # - cleanup:
