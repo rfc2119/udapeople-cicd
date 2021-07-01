@@ -274,7 +274,7 @@ jobs:
             #     command: |
             #       # Your code here
             #       exit 1
-			- run:
+      - run:
           name: LogOnFail
           when: on_fail
           command: |
