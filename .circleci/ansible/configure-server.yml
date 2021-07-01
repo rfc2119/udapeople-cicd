@@ -1,5 +1,5 @@
 ---
-
+# configuring an ubuntu server
 - name: "configuration play." 
   hosts: web
   user: ubuntu
@@ -14,7 +14,10 @@
       # Your code here
 
     - name: "install python for Ansible."
+      apt:
+        name: python3
       # Your code here
 
   roles:
     # Your code here
+    - configure-server
