@@ -16,11 +16,12 @@ version: 2.1
 # NOTE: conditional steps circleci https://circleci.com/docs/2.0/reusing-config/#defining-conditional-steps
 #
 # pipeline variables
+# TODO: do not hard-code workflow-id
 parameters:
   workflow-id:
     type: string
     # default: "cd0d8qrsenyt"   # for dev and testing. hint: RDS auto-generated ID
-    default: << pipeline.number >>    # prod workflow id. uncomment when going to prod
+    default: "8add28dd"         # prod workflow id. uncomment when going to prod
 
 commands:
   # TODO: needs improvment
@@ -90,6 +91,7 @@ commands:
             aws s3 rm s3://udapeople-${<< parameters.id >>}/ --recursive
             aws cloudformation delete-stack --stack-name udapeople-frontend-${<< parameters.id >>}
             aws cloudformation delete-stack --stack-name udapeople-backend-${<< parameters.id >>}
+            # TODO: cloudfront stack should not be created by hand
             # aws cloudformation delete-stack --stack-name udapeople-cloudfront
 
   revert-migrations:
@@ -550,7 +552,8 @@ jobs:
               aws cloudformation delete-stack --stack-name udapeople-backend-$DEV_WORKFLOW_ID
             fi
       # Here's where you will add some code to rollback on failure
-      - revert-migrations
+      - revert-migrations:
+          id: PROD_WORKFLOW_ID
       - destroy-environment:
           id: PROD_WORKFLOW_ID
 
