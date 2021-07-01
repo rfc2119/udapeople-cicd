@@ -154,8 +154,9 @@ jobs:
       - checkout
       - add_ssh_keys:
           fingerprints:
-            - "13:19:d0:85:aa:eb:66:62:a6:99:db:99:a7:8d:5a:51"
-            - "a3:69:6a:6a:e1:71:46:13:bd:f6:a8:52:2a:1e:57:d4"
+            - "13:19:d0:85:aa:eb:66:62:a6:99:db:99:a7:8d:5a:51"   # udacity project 3 key
+      - run:
+          yum install -y tar gzip
       - run:
           name: Ensure back-end infrastructure exists
           command: |
@@ -177,8 +178,6 @@ jobs:
           command: |
             echo "cwd: $CIRCLE_WORKING_DIRECTORY"
             ls -la
-            # apt install tree
-            # tree
             aws ec2 describe-instances \
               --filters Name="tag:Name,Values=backend-$ID" \
               --query 'Reservations[*].Instances[*].PublicIpAddress' \
