@@ -1,1 +1,2 @@
 https://github.com/staticnotdynamic/udapeople-cicd
+http://udapeople-cd0d8qrsenyt.s3-website.ap-northeast-2.amazonaws.com
