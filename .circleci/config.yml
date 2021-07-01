@@ -318,6 +318,7 @@ jobs:
             export API_URL="http://${BACKEND_IP}:3030"
             echo "Backend API URL: ${API_URL}"
             cd frontend
+            npm install webpack # TODO: why ? isn't this already installed ?
             npm run build   # bakes the API_URL into the generated code
       - run:
           name: Deploy frontend objects
