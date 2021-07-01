@@ -1,0 +1,55 @@
+Description: >
+  Deploys a single EC2 instance as Prometheus Server
+
+Parameters:
+  ID:
+    Description: Unique identifier.
+    Type: String
+
+Resources:
+  InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Sub Prometheus-${ID}
+      GroupDescription: Allow inbound 9090, 9100, 9093 and SSH
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 9090
+          ToPort: 9090
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 9100
+          ToPort: 9100
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 9093
+          ToPort: 9093
+          CidrIp: 0.0.0.0/0
+
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      SecurityGroups:
+        - Ref: InstanceSecurityGroup
+      KeyName: udacity-nd-proj3
+      # If this ami id is not available for you, you can find another (https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/finding-an-ami.html)
+      ImageId: ami-0d639d4ce86041be5 # Ubuntu Focal 20.04 LTS EBS-SSD
+      BlockDeviceMappings:
+        - DeviceName: "/dev/sda1"
+          Ebs:
+            VolumeSize: '8'
+            VolumeType: "standard"
+      Tags:
+        - Key: Name
+          Value: !Sub prometheus-${ID}
+Outputs:
+  PublicDNS:
+    Value: !Join ['', [ !GetAtt EC2Instance.PublicDnsName]]  
+    Description: Public DNS for Prometheus server
+    # Export:
+    #   Name: PublicDNS
