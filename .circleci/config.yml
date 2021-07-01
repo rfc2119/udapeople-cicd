@@ -17,6 +17,8 @@ version: 2.1
 #
 # pipeline variables
 # TODO: do not hard-code workflow-id
+# TODO: prom IAM user from cloudformation
+
 parameters:
   workflow-id:
     type: string
