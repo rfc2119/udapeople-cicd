@@ -1,5 +1,6 @@
 version: 2.1
 
+# TODO: repeated installation of typescript and webpack
 # pipeline variables
 parameters:
   workflow-id:
@@ -251,6 +252,7 @@ jobs:
           name: Run migrations
           command: |
             cd backend    # migrations script are found at the backend
+            npm install typescript  # install typescript (no need to install ALL packages)
             npm run migrations > migrations.out
             grep "has been executed successfully" migrations.out
             if [[ $(echo $?) != 0 ]];
@@ -284,7 +286,7 @@ jobs:
           name: Install dependencies
           command: |
             cd frontend
-            npm install typescript  # install typescript (no need to install ALL packages)
+            npm install webpack # install webpack
             npm run build
       - run:
           name: Get backend url
