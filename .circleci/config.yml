@@ -349,8 +349,8 @@ jobs:
           at: ~/
       - restore_cache:
           keys:
-            - v2-pip-cache
             - backend-build
+            - v2-pip-cache
       - run:
           name: Install dependencies
           command: |
