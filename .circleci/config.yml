@@ -14,6 +14,7 @@ version: 2.1
 # errors) which is unsolved as well
 # TODO: on_fail in destroy-environments command
 # NOTE: conditional steps circleci https://circleci.com/docs/2.0/reusing-config/#defining-conditional-steps
+# NOTE: SSH'ing into a job runs after the job fails
 #
 # pipeline variables
 # TODO: do not hard-code workflow-id

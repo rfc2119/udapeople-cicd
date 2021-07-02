@@ -32,6 +32,7 @@
     # TODO: systemd and start as a service
 
 # TODO: because smoke-test sometimes fails
+# could use: aws cloudformation wait stack-create-complete --stack-name name
 - name: wait for application to start
   pause:
     seconds: 20
